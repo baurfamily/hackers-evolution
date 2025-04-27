@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		3F0CE7302DBE03DA00C20C7E /* SwiftyLua in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE72F2DBE03DA00C20C7E /* SwiftyLua */; };
+		3F0CE7392DBE071B00C20C7E /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE7382DBE071B00C20C7E /* CodeEditorView */; };
+		3F0CE73B2DBE071B00C20C7E /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE73A2DBE071B00C20C7E /* LanguageSupport */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		3F0CE7122DBE039800C20C7E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +58,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0CE7302DBE03DA00C20C7E /* SwiftyLua in Frameworks */,
+				3F0CE73B2DBE071B00C20C7E /* LanguageSupport in Frameworks */,
+				3F0CE7392DBE071B00C20C7E /* CodeEditorView in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +121,9 @@
 			);
 			name = "Hackers Evolution";
 			packageProductDependencies = (
+				3F0CE72F2DBE03DA00C20C7E /* SwiftyLua */,
+				3F0CE7382DBE071B00C20C7E /* CodeEditorView */,
+				3F0CE73A2DBE071B00C20C7E /* LanguageSupport */,
 			);
 			productName = "Hackers Evolution";
 			productReference = 3F0CE7032DBE039400C20C7E /* Hackers Evolution.app */;
@@ -195,6 +207,10 @@
 			);
 			mainGroup = 3F0CE6FA2DBE039400C20C7E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				3F0CE72E2DBE03DA00C20C7E /* XCRemoteSwiftPackageReference "SwiftyLua" */,
+				3F0CE7372DBE071B00C20C7E /* XCRemoteSwiftPackageReference "CodeEditorView" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 3F0CE7042DBE039400C20C7E /* Products */;
 			projectDirPath = "";
@@ -593,6 +609,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		3F0CE72E2DBE03DA00C20C7E /* XCRemoteSwiftPackageReference "SwiftyLua" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftyLua/SwiftyLua";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		3F0CE7372DBE071B00C20C7E /* XCRemoteSwiftPackageReference "CodeEditorView" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/mchakravarty/CodeEditorView";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3F0CE72F2DBE03DA00C20C7E /* SwiftyLua */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F0CE72E2DBE03DA00C20C7E /* XCRemoteSwiftPackageReference "SwiftyLua" */;
+			productName = SwiftyLua;
+		};
+		3F0CE7382DBE071B00C20C7E /* CodeEditorView */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F0CE7372DBE071B00C20C7E /* XCRemoteSwiftPackageReference "CodeEditorView" */;
+			productName = CodeEditorView;
+		};
+		3F0CE73A2DBE071B00C20C7E /* LanguageSupport */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3F0CE7372DBE071B00C20C7E /* XCRemoteSwiftPackageReference "CodeEditorView" */;
+			productName = LanguageSupport;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 3F0CE6FB2DBE039400C20C7E /* Project object */;
 }

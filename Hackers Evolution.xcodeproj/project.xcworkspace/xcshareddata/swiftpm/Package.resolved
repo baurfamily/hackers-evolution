@@ -1,0 +1,51 @@
+{
+  "originHash" : "6dcec521983760e0aad75b61b5f69be97cf2d125c8bb6d17a21bb97d109390a0",
+  "pins" : [
+    {
+      "identity" : "clua",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyLua/CLua",
+      "state" : {
+        "revision" : "12e19f89b9089dbc87615e1823049791cd665353",
+        "version" : "5.4.7"
+      }
+    },
+    {
+      "identity" : "codeeditorview",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/mchakravarty/CodeEditorView",
+      "state" : {
+        "revision" : "aba6c189bb2f6fd9d7b8e9f5739aeb3c8c7e3254",
+        "version" : "0.15.4"
+      }
+    },
+    {
+      "identity" : "lua4swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyLua/lua4swift",
+      "state" : {
+        "revision" : "a7a2a0dae6a7bcee3c03cf794bb90050033552ff",
+        "version" : "1.1.3"
+      }
+    },
+    {
+      "identity" : "rearrange",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ChimeHQ/Rearrange.git",
+      "state" : {
+        "revision" : "5ff7f3363f7a08f77e0d761e38e6add31c2136e1",
+        "version" : "1.8.1"
+      }
+    },
+    {
+      "identity" : "swiftylua",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftyLua/SwiftyLua",
+      "state" : {
+        "branch" : "main",
+        "revision" : "1b7461d1a23b220924b42a5cbe53ba7637f527ce"
+      }
+    }
+  ],
+  "version" : 3
+}
