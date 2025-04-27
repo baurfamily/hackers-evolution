@@ -10,6 +10,7 @@
 		3F0CE7302DBE03DA00C20C7E /* SwiftyLua in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE72F2DBE03DA00C20C7E /* SwiftyLua */; };
 		3F0CE7392DBE071B00C20C7E /* CodeEditorView in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE7382DBE071B00C20C7E /* CodeEditorView */; };
 		3F0CE73B2DBE071B00C20C7E /* LanguageSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 3F0CE73A2DBE071B00C20C7E /* LanguageSupport */; };
+		3F0CE8B32DBE1CBA00C20C7E /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 3F0CE8B22DBE1CB500C20C7E /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +34,7 @@
 		3F0CE7032DBE039400C20C7E /* Hackers Evolution.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Hackers Evolution.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F0CE7112DBE039800C20C7E /* Hackers EvolutionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hackers EvolutionTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F0CE71B2DBE039800C20C7E /* Hackers EvolutionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hackers EvolutionUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F0CE8B22DBE1CB500C20C7E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -84,6 +86,7 @@
 		3F0CE6FA2DBE039400C20C7E = {
 			isa = PBXGroup;
 			children = (
+				3F0CE8B22DBE1CB500C20C7E /* README.md */,
 				3F0CE7052DBE039400C20C7E /* Hackers Evolution */,
 				3F0CE7142DBE039800C20C7E /* Hackers EvolutionTests */,
 				3F0CE71E2DBE039800C20C7E /* Hackers EvolutionUITests */,
@@ -228,6 +231,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F0CE8B32DBE1CBA00C20C7E /* README.md in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
