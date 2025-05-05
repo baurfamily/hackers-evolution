@@ -1,18 +1,21 @@
-local LIMIT = 12
+local LIMIT = 127
 
 -- start in the middle... just 'cause
 local Tape = { pos = math.floor(LIMIT/2) }
 
--- set our array to all zeroes
-for i=0, LIMIT-1 do
-  Tape[i] = 0
-end
+
 Tape.__index = Tape
 
 function Tape:new(o)
     o = o or {}              -- create object if user does not provide one
     setmetatable(o, self)    -- sets this up Tape as the prototype for o
     self.__index = self      -- creates inheritance (ie: lookup) behavior
+    
+    -- set our array to all zeroes
+    for i=0, LIMIT-1 do
+      o[i] = 0
+    end
+    
     return o
 end
 
@@ -142,13 +145,14 @@ HELa['|'] = HELa.djump
 
 -- convinience method, not part of the 'lanugage'
 -- prints out the ascii equivilent of the data tape
--- starts from current position
--- ends at 0 or 'end' of the tape
+-- starts at -1 or 'end' of the tape
+-- ends at current position
+-- (runs backwards for convinience)
 function HELa:print()
     bytes = {}
-    for i=0, LIMIT do
+    for i=1, LIMIT do
         -- 1-indexed arrays in lua!
-        bytes[i+1] = self.dataTape[ (self.dataTape.pos + i) % LIMIT ]
+        bytes[i] = self.dataTape:read(-i)
     end
     
     -- convert to ascii, filter out non-printables
@@ -164,7 +168,7 @@ end
 
 function HELa:execute()
     continue = 1
-    while continue==1 do
+    for i=0, LIMIT do
         func = string.char( self.langTape:read() )
         
         print("found: "..func)
