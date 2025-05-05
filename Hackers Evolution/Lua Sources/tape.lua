@@ -1,10 +1,11 @@
-local LIMIT = 10
+local LIMIT = 127
 
 -- start in the middle... just 'cause
 local Tape = { pos = math.floor(LIMIT/2) }
 
 -- set our array to all zeroes
 for i=0, LIMIT-1 do
+  Tape.LIMIT = LIMIT
   Tape[i] = 0
 end
 Tape.__index = Tape

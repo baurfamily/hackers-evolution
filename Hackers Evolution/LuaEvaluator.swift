@@ -18,7 +18,7 @@ struct LuaEvaluator: View {
         hela:execute()
         str = hela:print()
         
-        return str, hela
+        return str
         """
     @State var position: CodeEditor.Position = .init(selections: [NSMakeRange(0, 0)], verticalScrollPosition: 0)
     @State var messages: Set<TextLocated<Message>> = Set()

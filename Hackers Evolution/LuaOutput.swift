@@ -12,26 +12,29 @@ struct LuaOutput : View {
     let script: String
     var output: [String] = []
     
+    let lua = LuaVM()
     
-    init(script: String) {
-        let lua = LuaVM()
-        self.script = script
-        
-        let filename = "hela"
-        guard let url = Bundle.main.url(forResource: filename, withExtension: "lua") else {
-            fatalError("\(filename).lua not found")
+    func loadScript(file: String, global: String) {
+        guard let url = Bundle.main.url(forResource: file, withExtension: "lua") else {
+            fatalError("\(file).lua not found")
         }
       
-        let intermediateResult =
-          try? lua.execute(url: url)
+        let intermediateResult = try? lua.execute(url: url)
 
         if let intermediateResult {
             if case VirtualMachine.EvalResults.values(let returnValue) = intermediateResult {
-                lua.globals["he"] = returnValue[0]
+                lua.globals[global] = returnValue[0]
             }
         } else {
             print("failed to incorporate intermediate result")
         }
+    }
+    
+    init(script: String) {
+        self.script = script
+        
+        loadScript(file: "tape", global: "Tape")
+        loadScript(file: "hela", global: "HELa")
         
         let result = try? lua.execute(string: script)
 
