@@ -96,5 +96,6 @@ Increment the current data value by 1
 
 Decrement the current data value by 1
 
+#### COPY start_position length
 
-
+Copies data from the program Tape to the data Tape starting at *start_position* and running for *length*

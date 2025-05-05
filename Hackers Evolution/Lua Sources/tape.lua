@@ -1,9 +1,7 @@
-local he = {}
-
 local LIMIT = 10
 
 -- start in the middle... just 'cause
-Tape = { pos = math.floor(LIMIT/2) }
+local Tape = { pos = math.floor(LIMIT/2) }
 
 -- set our array to all zeroes
 for i=0, LIMIT-1 do
@@ -30,7 +28,7 @@ function Tape:insert(val, relativePos)
 end
 
 function Tape:move(relativePos)
-    relativePos = relativePos or 0
+    relativePos = relativePos or 1
     self.pos = (self.pos + relativePos) % LIMIT
 end
 
@@ -49,37 +47,10 @@ function Tape:dump()
     return a
 end
 
-d_tape = Tape:new()
-l_tape = Tape:new()
-
-he.dataTape = d_tape
-he.langTape = l_tape
-
-he.program = {}
-
-
-
-he.instructions = {
-    insert = function(val)
-    end,
-    add = function(value)
-        dataTape.insert(value)
-    end,
-    pswap = function() end,
-    jump = function(relative_position) end,
-    djump = function() end,
-    noop = function() end,
-    gt = function(comparison, relative_position) end,
-    lt = function(comparison, relative_position) end,
-    
-    dupe = function() end,
-    pop = function()
-        return table.remove( he.state )
-    end
-}
-
-he.execute = function()
-    print("do something to execute")
+-- same as skip, don't need both?
+function Tape:next()
+    self.pos = (self.pos + 1) % LIMIT
+    return self[self.pos]
 end
 
-return he
+return Tape

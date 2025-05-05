@@ -17,11 +17,10 @@ struct LuaOutput : View {
         let lua = LuaVM()
         self.script = script
         
-        let filename = "HE_Language"
+        let filename = "hela"
         guard let url = Bundle.main.url(forResource: filename, withExtension: "lua") else {
             fatalError("\(filename).lua not found")
         }
-//        let scriptData = try? Data(contentsOf: url)
       
         let intermediateResult =
           try? lua.execute(url: url)
@@ -30,7 +29,8 @@ struct LuaOutput : View {
             if case VirtualMachine.EvalResults.values(let returnValue) = intermediateResult {
                 lua.globals["he"] = returnValue[0]
             }
-            print("Intermediate result: \(intermediateResult)")
+        } else {
+            print("failed to incorporate intermediate result")
         }
         
         let result = try? lua.execute(string: script)
@@ -54,6 +54,9 @@ struct LuaOutput : View {
     func inspect(value: lua4swift.Value, key: String? = nil) -> [String] {
         if let table = value as? lua4swift.Table {
             return inspect(table: table, key: key)
+        } else if let other = value as? lua4swift.Userdata {
+            print("other?")
+            return ["?\(other)?"]
         } else {
             if let key {
                 return ["\(key) = \(value.self)"]
