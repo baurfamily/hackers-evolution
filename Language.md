@@ -48,43 +48,43 @@ The real catch, though, is that Instructions are NOT represented in the Tape wit
 
 ### Instruction Set
 
-#### INSERT [val]
+#### `=` INSERT [val]
 
 Copies the *val* in the next cell (ie: the argument) to the current Data cell, pushing any value currently there to the next position in the Tape.
 
-#### ADD val
+#### `+` ADD val
 
 Adds the *val* in the next language cell to the current value of the data Tape.
 
-#### PSWAP
+#### `%` PSWAP
 
 Swaps the Execution and Data Pointers - the Tapes will now take on opposite roles and Program execution will step the new Tape.
 
-#### JUMP relative_position
+#### `!` JUMP relative_position
 
 Jumps the Execution pointer to a new *relative_location* based on the given value.
 
-#### DJUMP
+#### `|` DJUMP
 
 Jumps the Executin pointer to a new position based on the current value of the data pointer. 
 
-#### NOOP
+#### ` ` NOOP
 
 Does nothing. Execution pointer simply shifts to the next cell.
 
-#### GT comparrison false_position
+#### `>` GT comparrison false_position
 
 Compares the *comparrison* value to the current value stored on the Data Tape. If the argument value is greater than the data value execution continues after the next cell (ie: skip the cell the *false_position* is stored in). If the comparison is false, skip to the position indicated by *false_position* to continue execution.
 
-#### LT comparrison false_position
+#### `<` LT comparrison false_position
 
 Same as `GT` but uses less than instead of greater than.
 
-#### DUPE
+#### `#` DUPE
 
 Duplicates the current value pointed to on the data Tape. The data pointer is sifted to point to the first one.
 
-#### MOVE relative_position
+#### `` MOVE relative_position
 
 Moves the data pointer the amount specified by *relative_position*
 

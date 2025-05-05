@@ -12,19 +12,13 @@ import LanguageSupport
 struct LuaEvaluator: View {
 //    @State var scriptToExecute: String = ""
     @State var script: String = """
-        -- `hela` is the Hackers Evolution reference/programming object
+        hela = HELa:new()
         
-        hela.program = "asdf"
-        hela.dataTape:insert(72)
-        hela.dataTape:insert(101)
-        hela.dataTape:insert(108)
-        hela.dataTape:insert(108)
-        hela.dataTape:insert(48)
+        hela:setProgram("=H=e=l=l=o")
+        hela:execute()
+        str = hela:print()
         
-        str = hela.dataTape:print(6)
-
-        -- return with other testing stuff
-        return str, hela.dataTape:dump(), hela.dataTape.pos
+        return str, hela
         """
     @State var position: CodeEditor.Position = .init(selections: [NSMakeRange(0, 0)], verticalScrollPosition: 0)
     @State var messages: Set<TextLocated<Message>> = Set()
