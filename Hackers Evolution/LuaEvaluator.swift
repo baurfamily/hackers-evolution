@@ -14,11 +14,18 @@ struct LuaEvaluator: View {
     @State var script: String = """
         hela = HELa:new()
         
-        hela:setProgram("=H=e=l=l=o")
+        hela:setProgram([[
+        = H
+        = e
+        = l
+        = l
+        = o
+        ]])
+        
         hela:execute()
         str = hela:print()
         
-        return str
+        return str, hela.langTape
         """
     @State var position: CodeEditor.Position = .init(selections: [NSMakeRange(0, 0)], verticalScrollPosition: 0)
     @State var messages: Set<TextLocated<Message>> = Set()

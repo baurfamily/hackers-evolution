@@ -28,8 +28,18 @@ function Tape:insert(val, relativePos)
     return v
 end
 
+-- writes a new value, returning the old
+-- does not shift the read pointer
+function Tape:write(val, relativePos)
+    relativePos = (relativePos or 0) % LIMIT
+    local pos = ((self.pos + relativePos - 1) % LIMIT) + 1
+    local v = self[pos]
+    self[self.pos] = val
+    return v
+end
+
 function Tape:move(relativePos)
-    relativePos = relativePos or 1
+    relativePos = relativePos or 0
     self.pos = (self.pos + relativePos) % LIMIT
 end
 
@@ -48,7 +58,6 @@ function Tape:dump()
     return a
 end
 
--- same as skip, don't need both?
 function Tape:next()
     self.pos = (self.pos + 1) % LIMIT
     return self[self.pos]

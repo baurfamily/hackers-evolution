@@ -4,17 +4,34 @@ local LIMIT = 127
 
 -- this wasn't loading correctly
 -- local Tape = require("tape")
-HELa = {}
+local HELa = {}
 
 HELa.__index = HELa
 
 -- sets the initial conditions for the language tape
-function HELa:setProgram(str)
+function HELa:setProgramBytes(str)
     for i=1, #str do
+        -- print("put: "..str:byte(i))
         -- our tape is sort of 0 indexed, normal lua arrays are 1-indexed
         self.langTape[i] = str:byte(i)
     end
 end
+
+function HELa:setProgram(str)
+    local i = 1
+    for token in str:gmatch('%S+') do
+        if token:match('%d+') then
+            print("write int("..i.."): "..token)
+            self.langTape[i] = tonumber(token)
+        else
+            print("write str("..i.."): "..token)
+            self.langTape[i] = token:byte(1)
+        end
+        i = i + 1
+    end
+end
+
+
 
 -- create a new program object
 function HELa:new(prog)
@@ -27,7 +44,7 @@ function HELa:new(prog)
     
     o.dataTape = o.d_tape
     o.langTape = o.l_tape
-    
+
     if prog then
         o:setProgram(prog)
     end
@@ -46,7 +63,7 @@ HELa[' '] = HELa.noop
 -- inserts a value into the data tape
 function HELa:insert()
     local val = self.langTape:next()
-    -- print("insert( "..val.." )")
+    print("insert( "..val.." )")
     self.dataTape:insert(val)
 end
 HELa['='] = HELa.insert
@@ -59,7 +76,7 @@ function HELa:add()
     local newVal = val + curr
     self.dataTape:insert(newVal, 1)
 end
-HELa['+'] = HELa.add
+HELa['#'] = HELa.add
 
 -- swaps the language and data tape
 function HELa:pswap()
@@ -83,6 +100,48 @@ function HELa:djump()
     self.langTape:move(relativePos)
 end
 HELa['|'] = HELa.djump
+
+function HELa:gt()
+    local val = self.dataTape:read()
+    local comp = self.langTape:next()
+    local truePos = self.langTape:next()
+    
+    if val > comp then
+        self.langTape:move(truePos)
+    end
+end
+HELa['>'] = HELa.dup
+
+function HELa:lt()
+    local val = self.dataTape:read()
+    local comp = self.langTape:next()
+    local truePos = self.langTape:next()
+    
+    if val <= comp then
+        self.langTape:move(truePos)
+    end
+end
+HELa['<'] = HELa.dup
+
+function HELa:dup()
+    local val = self.dataTape:read()
+    self.dataTape:insert(val)
+end
+HELa['&'] = HELa.dup
+
+function HELa:inc()
+    local val = self.dataTape:read()
+    self.dataTape:write(val+1)
+end
+HELa['+'] = HELa.inc
+
+function HELa:dec()
+    local val = self.dataTape:read()
+    self.dataTape:write(val-1)
+end
+HELa['-'] = HELa.inc
+
+
 
 -- convinience method, not part of the 'lanugage'
 -- prints out the ascii equivilent of the data tape
@@ -108,20 +167,21 @@ function HELa:print()
 end
 
 function HELa:execute()
-    continue = 1
     for i=1, LIMIT do
+        one = string.char(self.langTape:read())
+        two = string.char(self.langTape:read(1))
+        print("func: "..one..two)
+        
         func = string.char( self.langTape:read() )
         
         if self[func] then else func = "noop" end
         
         self[func](self)
-        val = self.langTape:next()
-        if val==0 then continue = 0 end
+        self.langTape:next()
+        print("pos = "..self.langTape.pos)
     end
     -- print("--- program execution complete ---")
 end
-
-helaSample = HELa:new("=H=e=l=l=o")
 
 -- using a global, not "proper" but it works
 return HELa

@@ -52,7 +52,7 @@ The real catch, though, is that Instructions are NOT represented in the Tape wit
 
 Copies the *val* in the next cell (ie: the argument) to the current Data cell, pushing any value currently there to the next position in the Tape.
 
-#### `+` ADD val
+#### `#` ADD val
 
 Adds the *val* in the next language cell to the current value of the data Tape.
 
@@ -72,27 +72,27 @@ Jumps the Executin pointer to a new position based on the current value of the d
 
 Does nothing. Execution pointer simply shifts to the next cell.
 
-#### `>` GT comparrison false_position
+#### `>` GT comparrison true_position
 
-Compares the *comparrison* value to the current value stored on the Data Tape. If the argument value is greater than the data value execution continues after the next cell (ie: skip the cell the *false_position* is stored in). If the comparison is false, skip to the position indicated by *false_position* to continue execution.
+Compares the *comparrison* value to the current value stored on the Data Tape. If the argument value is greater than the data value execution continues skips to the position indicated by *true_position*. If not, executation continues after the next cell (ie: skip the cell the *true_position* is stored in). 
 
-#### `<` LT comparrison false_position
+#### `<` LT comparrison true_position
 
 Same as `GT` but uses less than instead of greater than.
 
-#### `#` DUPE
+#### `&` DUP
 
 Duplicates the current value pointed to on the data Tape. The data pointer is sifted to point to the first one.
 
-#### `` MOVE relative_position
+#### `_` MOVE relative_position
 
 Moves the data pointer the amount specified by *relative_position*
 
-#### INC
+#### `+` INC
 
 Increment the current data value by 1
 
-#### DEC
+#### `-` DEC
 
 Decrement the current data value by 1
 
