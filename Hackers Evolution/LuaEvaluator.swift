@@ -15,11 +15,11 @@ struct LuaEvaluator: View {
         hela = HELa:new()
         
         hela:setProgram([[
-        = H
-        = e
-        = l
-        = l
-        = o
+        =H
+        =e
+        =l
+        =l
+        =o
         ]])
         
         hela:execute()

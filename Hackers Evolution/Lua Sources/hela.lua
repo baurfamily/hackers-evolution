@@ -1,10 +1,6 @@
-local LIMIT = 127
-
 -- Hacker's Evolution Language
 
--- this wasn't loading correctly
--- local Tape = require("tape")
-local HELa = {}
+HELa = {}
 
 HELa.__index = HELa
 
@@ -12,20 +8,29 @@ HELa.__index = HELa
 function HELa:setProgramBytes(str)
     for i=1, #str do
         -- print("put: "..str:byte(i))
-        -- our tape is sort of 0 indexed, normal lua arrays are 1-indexed
         self.langTape[i] = str:byte(i)
     end
 end
 
 function HELa:setProgram(str)
-    local i = 1
+    local i = 0
     for token in str:gmatch('%S+') do
-        if token:match('%d+') then
-            print("write int("..i.."): "..token)
-            self.langTape[i] = tonumber(token)
+        inst, param = token:match('(%g)(%d+)')
+        if inst then
+            -- print("write int("..i.."): "..token)
+            self.langTape:write(inst:byte(1), i)
+            i = i + 1
+            self.langTape:write(tonumber(param), i)
         else
-            print("write str("..i.."): "..token)
-            self.langTape[i] = token:byte(1)
+            inst, param = token:match('(%g)(%D)')
+            if inst then
+                self.langTape:write(inst:byte(1), i)
+                i = i + 1
+                self.langTape:write(param:byte(1), i)
+            else
+                -- print("write str("..i.."): "..token)
+                self.langTape:write(token:byte(1), i)
+            end
         end
         i = i + 1
     end
@@ -63,7 +68,7 @@ HELa[' '] = HELa.noop
 -- inserts a value into the data tape
 function HELa:insert()
     local val = self.langTape:next()
-    print("insert( "..val.." )")
+    -- print("insert( "..val.." )")
     self.dataTape:insert(val)
 end
 HELa['='] = HELa.insert
@@ -142,7 +147,6 @@ end
 HELa['-'] = HELa.inc
 
 
-
 -- convinience method, not part of the 'lanugage'
 -- prints out the ascii equivilent of the data tape
 -- starts at -1 or 'end' of the tape
@@ -167,18 +171,17 @@ function HELa:print()
 end
 
 function HELa:execute()
-    for i=1, LIMIT do
-        one = string.char(self.langTape:read())
-        two = string.char(self.langTape:read(1))
-        print("func: "..one..two)
-        
+    local startPos = self.langTape.pos - 1
+    if startPos == 0 then startPos = LIMIT end
+    
+    while self.langTape.pos ~= startPos do
         func = string.char( self.langTape:read() )
         
         if self[func] then else func = "noop" end
         
         self[func](self)
         self.langTape:next()
-        print("pos = "..self.langTape.pos)
+        -- print("pos = "..self.langTape.pos)
     end
     -- print("--- program execution complete ---")
 end

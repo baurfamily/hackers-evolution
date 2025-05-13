@@ -48,7 +48,7 @@ The real catch, though, is that Instructions are NOT represented in the Tape wit
 
 ### Instruction Set
 
-#### `=` INSERT [val]
+#### `=` INSERT val
 
 Copies the *val* in the next cell (ie: the argument) to the current Data cell, pushing any value currently there to the next position in the Tape.
 

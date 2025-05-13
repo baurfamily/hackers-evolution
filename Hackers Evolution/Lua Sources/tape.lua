@@ -1,7 +1,7 @@
-local LIMIT = 127
+LIMIT = 127
 
 -- start in the middle... just 'cause
-local Tape = { pos = math.floor(LIMIT/2) }
+Tape = { pos = math.floor(LIMIT/2) }
 
 -- set our array to all zeroes
 for i=0, LIMIT-1 do
@@ -34,7 +34,7 @@ function Tape:write(val, relativePos)
     relativePos = (relativePos or 0) % LIMIT
     local pos = ((self.pos + relativePos - 1) % LIMIT) + 1
     local v = self[pos]
-    self[self.pos] = val
+    self[pos] = val
     return v
 end
 
