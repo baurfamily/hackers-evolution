@@ -33,6 +33,18 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3F493C482DD45F3F0096BC53 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		3F090DD12DD068DD00839FD9 /* lua.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lua.h; path = ../../../../opt/homebrew/Cellar/lua/5.4.7/include/lua/lua.h; sourceTree = "<group>"; };
 		3F090DE42DD2C3BA00839FD9 /* libhelc.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libhelc.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,16 +53,17 @@
 		3F0CE71B2DBE039800C20C7E /* Hackers EvolutionUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Hackers EvolutionUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F0CE8B22DBE1CB500C20C7E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3F0CE8C42DC344E800C20C7E /* Language.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Language.md; sourceTree = "<group>"; };
+		3F493C4A2DD45F3F0096BC53 /* he */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = he; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FD3C85D2DC9DEAB00695A3F /* Examples.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Examples.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		3F090DE92DD2C3D300839FD9 /* Exceptions for "Hackers Evolution" folder in "helc" target */ = {
+		3F493C522DD45F960096BC53 /* Exceptions for "Hackers Evolution" folder in "he" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Lua Sources/test.c",
+				"HELc Sources/helc.c",
 			);
-			target = 3F090DE32DD2C3BA00839FD9 /* helc */;
+			target = 3F493C492DD45F3F0096BC53 /* he */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -58,7 +71,7 @@
 		3F0CE7052DBE039400C20C7E /* Hackers Evolution */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				3F090DE92DD2C3D300839FD9 /* Exceptions for "Hackers Evolution" folder in "helc" target */,
+				3F493C522DD45F960096BC53 /* Exceptions for "Hackers Evolution" folder in "he" target */,
 			);
 			path = "Hackers Evolution";
 			sourceTree = "<group>";
@@ -71,6 +84,11 @@
 		3F0CE71E2DBE039800C20C7E /* Hackers EvolutionUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Hackers EvolutionUITests";
+			sourceTree = "<group>";
+		};
+		3F493C4B2DD45F3F0096BC53 /* he */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = he;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -108,6 +126,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3F493C472DD45F3F0096BC53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -128,6 +153,7 @@
 				3F0CE7052DBE039400C20C7E /* Hackers Evolution */,
 				3F0CE7142DBE039800C20C7E /* Hackers EvolutionTests */,
 				3F0CE71E2DBE039800C20C7E /* Hackers EvolutionUITests */,
+				3F493C4B2DD45F3F0096BC53 /* he */,
 				3F090DEA2DD2C40200839FD9 /* Frameworks */,
 				3F0CE7042DBE039400C20C7E /* Products */,
 			);
@@ -140,6 +166,7 @@
 				3F0CE7112DBE039800C20C7E /* Hackers EvolutionTests.xctest */,
 				3F0CE71B2DBE039800C20C7E /* Hackers EvolutionUITests.xctest */,
 				3F090DE42DD2C3BA00839FD9 /* libhelc.dylib */,
+				3F493C4A2DD45F3F0096BC53 /* he */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -248,6 +275,28 @@
 			productReference = 3F0CE71B2DBE039800C20C7E /* Hackers EvolutionUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		3F493C492DD45F3F0096BC53 /* he */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F493C502DD45F3F0096BC53 /* Build configuration list for PBXNativeTarget "he" */;
+			buildPhases = (
+				3F493C462DD45F3F0096BC53 /* Sources */,
+				3F493C472DD45F3F0096BC53 /* Frameworks */,
+				3F493C482DD45F3F0096BC53 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3F493C4B2DD45F3F0096BC53 /* he */,
+			);
+			name = he;
+			packageProductDependencies = (
+			);
+			productName = he;
+			productReference = 3F493C4A2DD45F3F0096BC53 /* he */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -273,6 +322,9 @@
 						CreatedOnToolsVersion = 16.3;
 						TestTargetID = 3F0CE7022DBE039400C20C7E;
 					};
+					3F493C492DD45F3F0096BC53 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 				};
 			};
 			buildConfigurationList = 3F0CE6FE2DBE039400C20C7E /* Build configuration list for PBXProject "Hackers Evolution" */;
@@ -297,6 +349,7 @@
 				3F0CE7102DBE039800C20C7E /* Hackers EvolutionTests */,
 				3F0CE71A2DBE039800C20C7E /* Hackers EvolutionUITests */,
 				3F090DE32DD2C3BA00839FD9 /* helc */,
+				3F493C492DD45F3F0096BC53 /* he */,
 			);
 		};
 /* End PBXProject section */
@@ -351,6 +404,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3F0CE7172DBE039800C20C7E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3F493C462DD45F3F0096BC53 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -690,6 +750,30 @@
 			};
 			name = Release;
 		};
+		3F493C4E2DD45F3F0096BC53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EHM929N34N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3F493C4F2DD45F3F0096BC53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EHM929N34N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -734,6 +818,15 @@
 			buildConfigurations = (
 				3F0CE72C2DBE039800C20C7E /* Debug */,
 				3F0CE72D2DBE039800C20C7E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3F493C502DD45F3F0096BC53 /* Build configuration list for PBXNativeTarget "he" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F493C4E2DD45F3F0096BC53 /* Debug */,
+				3F493C4F2DD45F3F0096BC53 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
