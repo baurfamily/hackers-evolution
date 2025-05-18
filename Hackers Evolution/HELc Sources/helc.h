@@ -28,9 +28,9 @@ typedef enum Instruction {
             // 0010 =
             // 0001 = reverse string
     SWP,    // % - swaps 2 values on the stack: the top value and the value at top-<value>: 0 drops top value (swap with nothing?)
-    AND,    // & - allows the <value> of this cell to bit-wise concat with the next <value>, using the instruction in the next code point for the next instruction
+    AND,    // & - allows the <value> of this cell to bit-wise concat with the next <value>, using the instruction in the next code point for the next instruction. This allows for entering hexidecimal values directly, for example
     INC,    // ' - increment current value on the stack by <value>, replace stack entry
-    ANC,    // ( - start of looping construct/conditional, if stack is zero or less jumps just past matching END
+    ANC,    // ( - start of looping construct/conditional, if stack is zero or less jumps just past matching END. Looks at the stack position specified by <value> (0 is top of stack / current value)
     END,    // ) - jumps back to anchor, maybe? does the <value> matter? maybe a bitmask?
     MUL,    // * - multiple current stack entry by the stack entry pointed to my <value>; consume both values and push answer to the stack
     ADD,    // + - add current stack entry to second stack entry; consume both values and push answer to the stack
@@ -62,7 +62,7 @@ typedef struct Instance {
 char instructionToChar(Instruction inst);
 Instruction charToInstruction(const char c);
 
-int step(Program *prog, Stack *stack);
+int step(Program *prog, Stack *stack, int additionalValue);
 void executeWithStack(Program *prog, Stack *stack);
 void execute(Program *prog);
 void printStack(Stack stack);
@@ -73,3 +73,5 @@ Stack* newStack(void);
 Instance* newInstance(void);
 CodePoint codePointFromString(const char *str);
 Program* progFromString(const char *str);
+
+// #A(0#1%1,1)0

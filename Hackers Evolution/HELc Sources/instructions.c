@@ -9,21 +9,23 @@
 #include "instructions.h"
 
 #include <stdio.h>
+#include <stdbool.h>
 
-void instNOP(char val, Program *prog, Stack *stack) {
+void instNOP(int val, Program *prog, Stack *stack) {
     // this space intentionally left blank
 }
 
-void instRED(char val, Program *prog, Stack *stack);
+void instRED(int val, Program *prog, Stack *stack);
 
 //TODO: so much more to implement here...
-void instDUP(char val, Program *prog, Stack *stack) {
+void instDUP(int val, Program *prog, Stack *stack) {
+    // value is ignored for now, not sure exaclty how I want this to work
     char dup = stack->values[stack->pos];
     stack->pos++;
     stack->values[stack->pos] = dup;
 }
 
-void instINS(char val, Program *prog, Stack *stack) {
+void instINS(int val, Program *prog, Stack *stack) {
     //TODO: this is super unsafe (can buffer overflow)
     if (stack->pos >= PROG_SIZE) {
         printf("!Stack overrun in INS.");
@@ -33,14 +35,46 @@ void instINS(char val, Program *prog, Stack *stack) {
     stack->values[stack->pos] = val;
 }
 
-void instOUT(char val, Program *prog, Stack *stack) {
-    // this has implicit (and destructive) casting
-    printf("%s\n", stack->values);
+// this seems inefficient...
+void instOUT(int val, Program *prog, Stack *stack) {
+    bool oneVal   = ( val & 1 );
+    bool decimal  = ( val & 2 );
+//    bool notImp   = ( val & 4 );
+    bool reversed = ( val & 8 );
     
-    // need to account for options
+    if (oneVal) {
+        int pos = (reversed ? stack->pos : 0);
+        
+        if (decimal) {
+            printf("%d", stack->values[pos]);
+        } else {
+            printf("%c", (char)stack->values[pos]);
+        }
+    } else {
+        if (reversed) {
+            for (int i=stack->pos; i>=0; i--) {
+                if (decimal) {
+                    printf("%d ", stack->values[i]);
+                } else {
+                    printf("%c", (char)stack->values[i]);
+                }
+            }
+        } else {
+            for (int i=0; i<=stack->pos; i++) {
+                if (decimal) {
+                    printf("%d ", stack->values[i]);
+                } else {
+                    printf("%c", (char)stack->values[i]);
+                }
+            }
+        }
+    }
+    
+    // not sure if I really want this
+    printf("\n");
 }
 
-void instSWP(char val, Program *prog, Stack *stack) {
+void instSWP(int val, Program *prog, Stack *stack) {
     // save current position locally for convinience
     // must have at least 2 values for this to work
     if (stack->pos<val) {
@@ -58,9 +92,11 @@ void instSWP(char val, Program *prog, Stack *stack) {
     }
 }
 
-void instAND(char val, Program *prog, Stack *stack);
+void instAND(int val, Program *prog, Stack *stack) {
+    step(prog, stack, val);
+}
 
-void instINC(char val, Program *prog, Stack *stack) {
+void instINC(int val, Program *prog, Stack *stack) {
     // stack overrun implicitly inserts a value
     if (stack->pos<0) {
         stack->pos = 0;
@@ -69,19 +105,47 @@ void instINC(char val, Program *prog, Stack *stack) {
     stack->values[stack->pos] = stack->values[stack->pos] + val;
 };
 
-void instANC(char val, Program *prog, Stack *stack) {
-    // note: value ignored
-    if (stack->values[stack->pos] <= 0) {
-        
+void instANC(int val, Program *prog, Stack *stack) {
+//    printf("compare %d to %d", val, stack->values[stack->pos]);
+    // stack index out of bounds ends loop
+    if (stack->pos < val || stack->values[stack->pos-val] <= 0) {
+        int anchorCount = 1;
+        bool endFound = false;
+        while (!endFound && prog->pos < PROG_SIZE) {
+            prog->pos = prog->pos + 1;
+            switch (prog->code[prog->pos].inst) {
+                case ANC:
+                    anchorCount++;
+                case END:
+                    anchorCount--;
+                    if (anchorCount <= 0)
+                        endFound = true;
+            }
+        }
     }
 }
 
-void instEND(char val, Program *prog, Stack *stack) {
-    // note: value ignored
+void instEND(int val, Program *prog, Stack *stack) {
+    // note: value currently ignored
+    int anchorCount = 1;
+    bool endFound = false;
+    while (!endFound && prog->pos >= 0) {
+        prog->pos = prog->pos - 1;
+        switch (prog->code[prog->pos].inst) {
+            case END:
+                anchorCount++;
+            case ANC:
+                anchorCount--;
+                if (anchorCount <= 0)
+                    endFound = true;
+        }
+    }
+    // decrement one more so the ANC executes next
+    prog->pos = prog->pos - 1;
 }
 
 
-void instMUL(char val, Program *prog, Stack *stack) {
+void instMUL(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -110,7 +174,7 @@ void instMUL(char val, Program *prog, Stack *stack) {
     }
 }
 
-void instADD(char val, Program *prog, Stack *stack) {
+void instADD(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -139,7 +203,7 @@ void instADD(char val, Program *prog, Stack *stack) {
     }
 }
 
-void instDEC(char val, Program *prog, Stack *stack) {
+void instDEC(int val, Program *prog, Stack *stack) {
     // stack overrun implicitly inserts a value
     if (stack->pos<0) {
         stack->pos = 0;
@@ -148,7 +212,7 @@ void instDEC(char val, Program *prog, Stack *stack) {
     stack->values[stack->pos] = stack->values[stack->pos] - val;
 }
 
-void instSUB(char val, Program *prog, Stack *stack) {
+void instSUB(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -177,9 +241,9 @@ void instSUB(char val, Program *prog, Stack *stack) {
     }
 }
 
-void instDAT(char val, Program *prog, Stack *stack);
+void instDAT(int val, Program *prog, Stack *stack);
 
-void instDIV(char val, Program *prog, Stack *stack) {
+void instDIV(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case

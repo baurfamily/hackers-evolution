@@ -20,7 +20,7 @@ This got me thinking about better ways to simulate evolution with a small langua
 
 ## Other insprirations
 
-A cool experiemnt using Brainfuck was done by a google engineer (when I find the link I'll add it) allowing him to simulate the move from self-assembly to self-replication. I'm not suren if I'll get around to replicating that setup, but its a facinating use case to considier.
+A cool experiemnt using Brainfuck was done by a google engineer (https://arxiv.org/pdf/2406.19108) allowing him to simulate the move from self-assembly to self-replication. I'm not suren if I'll get around to replicating that setup, but its a facinating use case to considier.
 
 ## Conceptual foundation
 

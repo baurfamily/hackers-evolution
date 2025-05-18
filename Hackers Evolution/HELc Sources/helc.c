@@ -12,12 +12,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-int step(Program *prog, Stack *stack) {
+int step(Program *prog, Stack *stack, int additionalVal) {
     prog->pos = prog->pos + 1;
     
     CodePoint code = prog->code[prog->pos];
     Instruction inst = code.inst;
-    char val = code.val;
+    unsigned int val = code.val + (additionalVal << 4);
     
     if (inst==0) return 0;
     
@@ -28,10 +28,10 @@ int step(Program *prog, Stack *stack) {
         case INS: instINS(val, prog, stack); break;
         case OUT: instOUT(val, prog, stack); break;
         case SWP: instSWP(val, prog, stack); break;
-//            case AND: return '&';
+        case AND: instAND(val, prog, stack); break;
         case INC: instINC(val, prog, stack); break;
-//            case ANC: return '(';
-//            case END: return ')';
+        case ANC: instANC(val, prog, stack); break;
+        case END: instEND(val, prog, stack); break;
         case MUL: instMUL(val, prog, stack); break;
         case ADD: instADD(val, prog, stack); break;
         case DEC: instDEC(val, prog, stack); break;
@@ -55,7 +55,7 @@ void executeWithStack(Program *prog, Stack *stack) {
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        int returnCode = step(prog, stack);
+        int returnCode = step(prog, stack, 0);
         if (returnCode==0) break;
         
         printStack(*stack);
@@ -153,7 +153,6 @@ Instance* newInstance(void) {
 
 void printStack(Stack stack) {
     for (int i=stack.pos; i>=0; i--) {
-        if (stack.values[i] == 0) continue;
         printf("%d ", stack.values[i]);
     }
 }

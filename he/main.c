@@ -87,7 +87,12 @@ void runRepl(void) {
         while (returnCode) {
             prog->code[prog->pos] = inputProg->code[inputProg->pos];
             prog->pos = prog->pos + 1;
-            returnCode = step(inputProg, stack);
+            returnCode = step(inputProg, stack, 0);
+            // #A(0#1%1,1)0#2
+            
+//            printf("%d => [ ", returnCode);
+//            printStack(*stack);
+//            printf("]\n\n");
         }
         printf("[ ");
         printStack(*stack);

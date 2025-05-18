@@ -1,5 +1,98 @@
 # Language Examples
 
+## HELC Language examples
+
+Looping
+```
+#A(0#1%1,1)0%0
+```
+
+Leaves stack as:
+```
+[ 1 1 1 1 1 1 1 1 1 1 ]
+```
+
+General loop strategy: `#A(0 ------ %1,1)0%0`
+
+* `#A` - insert 10 (loop variable))
+* `(0` - start loop (value is ignored)
+* `#1` - insert 1 (substitute other logic here)
+* `%1` - swap two stack values, so the loop var. is on top
+* `,1` - decrement the loop var by 1
+* `)0` - mark the end of the loop (value is ignored)
+* `%0` - drop the loop variable, as it's no longer needed
+
+## Working with the stack.
+
+### Clearing the stack:
+
+```
+(0%0)
+```
+
+This starts a loop, checking against the current stack value, drops that value and ten loops back. This will clear out any-non-zero values up to the first zero. 
+
+## Hello, world
+
+The ASCII values need to print "Hello, world" are listed below. Decimal and hexidecimal.
+```
+ H   e   l   l   o   ,       w   o   r   l   d 
+72  101 108 108 111 44  32  119 111 114 108 100
+48  65  6C  6C  6F  2C  20  77  6F  72  6C  64
+```
+
+With the hex values, we can use the `AND` operator to enter in the values somewhat directly and use the `OUT` operator to print:
+
+```
+&4#8&6#5&6#C&6#C&6#F&2#C&2#0&7#7&6#F&7#2&6#C&6#4$0
+```
+
+The other strategy, just to play with loops, is to do some math on the values. If we take the lowest value (the space) as a baseline, we can enter in the values and then add that value back
+
+```
+40 69 76 76 79 12 0 87 11 79 82 76 68
+```
+
+These values are too big to enter directly. Since we're trying a differnt method than the direct entry above, let's use some more addition and multiplication to get there
+
+* 40 = 4*10 = `#4#A*1`
+* 69 = 9 + 6*10 = `#9#6#A*1+1`
+
+... etc. Spaces added for convienience. If we can get to the value more directly, that style is shown.
+
+```
+#4#A*1
+#9#6#A*1+1
+#6#7#A*1+1
+#6#7#A*1+1
+#9#7#A*1+1
+#C
+#0
+#7#8#A*1+1
+#B
+#9#7#A*1+1
+#2#8#A*1+1
+#6#7#A*1+1
+#8#6#A*1+1
+```
+
+Conviniently, 32 is 16 doubled, so just to be different we'll insert 15, double it (add to itself) and add 2: `#F+0'2`.
+
+But we need to do this to each value in the existing stack, which will require a loop. Within the loop, we can DUP the value, we don't need to re-calculate it every time.
+
+```
+
+```
+
+## adding things...
+
+```
+#1#2#3#4#5#6#7#8#9
++2
+```
+
+
+# Old stuff
 ## Hello
 
 Note: This example shows how to run it via lua, after this example we'll only have the HELa code, without the boilerplate
