@@ -71,17 +71,15 @@ void runRepl(void) {
             break;
         }
         
-//        step(codePointFromString(input), stack);
-//        printStack(*stack);
-//        printf("\n");
-        
         CodePoint *code = progFromString(input);
-        executeWithStack(code, stack);
-        free(code);
-        printf("printing stack...\n");
+        int returnCode = -1;
+        int i = 0;
+        while (returnCode) {
+            returnCode = step(code[i], stack);
+            i++;
+        }
         printStack(*stack);
         printf("\n");
-
     }
     
 }
