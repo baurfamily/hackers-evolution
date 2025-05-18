@@ -36,9 +36,27 @@ int step(CodePoint code, Stack *stack) {
 //            case SUB: return '-';
 //            case DAT: return '.';
 //            case DIV: return '/';
-        default:  printf("unmatched instruction");
+        default:  printf("unmatched instruction\n");
     }
     return inst;
+}
+
+void executeWithStack(CodePoint *code, Stack *stack) {
+    printf("\nProgram execution!\n");
+    printProg(code);
+    
+    // init everything
+    for (int i=0; i<PROG_SIZE; i++) {
+        stack->values[i] = 0;
+        stack->pos = -1;
+    }
+    
+    for (int i=0; i<PROG_SIZE; i++) {
+        int returnCode = step(code[i], stack);
+        if (returnCode==0) break;
+        
+        printStack(*stack);
+    }
 }
 
 void execute(CodePoint *code) {
@@ -46,19 +64,7 @@ void execute(CodePoint *code) {
     printProg(code);
     
     Stack stack = { .values={}, .pos=-1 };
-    // init everything
-    for (int i=0; i<PROG_SIZE; i++) {
-        stack.values[i] = 0;
-        stack.pos = -1;
-    }
-    
-    
-    for (int i=0; i<PROG_SIZE; i++) {
-        int returnCode = step(code[i], &stack);
-        if (returnCode==0) break;
-        
-        printStack(stack);
-    }
+    executeWithStack(code, &stack);
 }
 
 Instruction charToInstruction(const char c) {

@@ -63,6 +63,7 @@ char instructionToChar(Instruction inst);
 Instruction charToInstruction(const char c);
 
 int step(CodePoint code, Stack *stack);
+void executeWithStack(CodePoint *code, Stack *stack);
 void execute(CodePoint *code);
 void printStack(Stack stack);
 void printProg(CodePoint *program);

@@ -14,12 +14,6 @@
 #define MAX_INPUT_SIZE 1024
 
 int main(int argc, const char * argv[]) {
-//    printf("Number of arguments: %d\n", argc);
-//
-//    for (int i = 0; i < argc; i++) {
-//        printf("Argument %d: %s\n", i, argv[i]);
-//    }
-
     // Example: Processing a specific argument
     if (argc > 1) {
         if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
@@ -77,8 +71,17 @@ void runRepl(void) {
             break;
         }
         
-        step(codePointFromString(input), stack);
+//        step(codePointFromString(input), stack);
+//        printStack(*stack);
+//        printf("\n");
+        
+        CodePoint *code = progFromString(input);
+        executeWithStack(code, stack);
+        free(code);
+        printf("printing stack...\n");
         printStack(*stack);
+        printf("\n");
+
     }
     
 }
