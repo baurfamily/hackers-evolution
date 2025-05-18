@@ -33,7 +33,12 @@ void instINS(char val, Stack *stack) {
     stack->values[stack->pos] = val;
 }
 
-void instOUT(char val, Stack *stack);
+void instOUT(char val, Stack *stack) {
+    // this has implicit (and destructive) casting
+    printf("%s\n", stack->values);
+    
+    // need to account for options
+}
 
 void instSWP(char val, Stack *stack) {
     // save current position locally for convinience
@@ -56,12 +61,12 @@ void instSWP(char val, Stack *stack) {
 void instAND(char val, Stack *stack);
 
 void instINC(char val, Stack *stack) {
-    // must have at least 1 value for this to work
+    // stack overrun implicitly inserts a value
     if (stack->pos<0) {
-        printf("!Stack underrun in DEC.");
-        return;
+        stack->pos = 0;
+        stack->values[0] = 0;
     }
-    stack->values[stack->pos]--;
+    stack->values[stack->pos] = stack->values[stack->pos] + val;
 };
 
 void instANC(char val, Stack *stack);
@@ -86,7 +91,7 @@ void instMUL(char val, Stack *stack) {
     
     if (val>0) {
         // save result
-        stack->values[stack->pos-1] = first * second;
+        stack->values[stack->pos-1] = second * first;
         
         // reduce stack
         stack->values[stack->pos] = 0;
@@ -98,46 +103,100 @@ void instMUL(char val, Stack *stack) {
 }
 
 void instADD(char val, Stack *stack) {
-    // must have at least 2 values for this to work
-    if (stack->pos<1) {
+    if (stack->pos<val) {
         printf("Stack underrun in MUL.");
-        return;
+        // for "safety" we reset to a simple case
+        val = (stack->pos<1 ? 1 : 0);
     }
-    stack->values[stack->pos] = stack->values[stack->pos-1];
-    stack->values[stack->pos-1] = stack->values[stack->pos] + stack->values[stack->pos-1];
-    stack->pos--;
+    
+    // save off relevant values
+    int first = stack->values[stack->pos];
+    int second = (val>0 ? stack->values[stack->pos-val] : first);
+
+    // shift values, if necessary, to cover the consumed value
+    for (int i=1; i<val; i++) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    }
+    
+    if (val>0) {
+        // save result
+        stack->values[stack->pos-1] = second + first;
+        
+        // reduce stack
+        stack->values[stack->pos] = 0;
+        stack->pos--;
+    } else {
+        // if val points to top of stack, square it in place
+        stack->values[stack->pos] = first + first;
+    }
 }
 
 void instDEC(char val, Stack *stack) {
-    // must have at least 1 value for this to work
+    // stack overrun implicitly inserts a value
     if (stack->pos<0) {
-        printf("Stack underrun in DEC.");
-        return;
+        stack->pos = 0;
+        stack->values[0] = 0;
     }
-    stack->values[stack->pos]--;
+    stack->values[stack->pos] = stack->values[stack->pos] - val;
 }
 
 void instSUB(char val, Stack *stack) {
-    // must have at least 2 values for this to work
-    if (stack->pos<1) {
+    if (stack->pos<val) {
         printf("Stack underrun in MUL.");
-        return;
+        // for "safety" we reset to a simple case
+        val = (stack->pos<1 ? 1 : 0);
     }
-    stack->values[stack->pos] = stack->values[stack->pos-1];
-    stack->values[stack->pos-1] = stack->values[stack->pos] - stack->values[stack->pos-1];
-    stack->pos--;
+    
+    // save off relevant values
+    int first = stack->values[stack->pos];
+    int second = (val>0 ? stack->values[stack->pos-val] : first);
+
+    // shift values, if necessary, to cover the consumed value
+    for (int i=1; i<val; i++) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    }
+    
+    if (val>0) {
+        // save result
+        stack->values[stack->pos-1] = second - first;
+        
+        // reduce stack
+        stack->values[stack->pos] = 0;
+        stack->pos--;
+    } else {
+        // if val points to top of stack, square it in place
+        stack->values[stack->pos] = first - first;
+    }
 }
 
 void instDAT(char val, Stack *stack);
 
 void instDIV(char val, Stack *stack) {
-    // must have at least 2 values for this to work
-    if (stack->pos<1) {
+    if (stack->pos<val) {
         printf("Stack underrun in MUL.");
-        return;
+        // for "safety" we reset to a simple case
+        val = (stack->pos<1 ? 1 : 0);
     }
-    stack->values[stack->pos] = stack->values[stack->pos-1];
-    stack->values[stack->pos-1] = stack->values[stack->pos] / stack->values[stack->pos-1];
-    stack->pos--;
+    
+    // save off relevant values
+    int first = stack->values[stack->pos];
+    int second = (val>0 ? stack->values[stack->pos-val] : first);
+
+    // shift values, if necessary, to cover the consumed value
+    for (int i=1; i<val; i++) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    }
+    
+    if (val>0) {
+        // save result
+        stack->values[stack->pos-1] = second / first;
+        
+        // reduce stack
+        stack->values[stack->pos] = 0;
+        stack->pos--;
+    } else {
+        // if val points to top of stack, square it in place
+        stack->values[stack->pos] = first / first;
+    }
 }
 

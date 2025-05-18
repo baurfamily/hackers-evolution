@@ -55,7 +55,10 @@ void runRepl(void) {
     
     char input[MAX_INPUT_SIZE];
 
+    CodePoint *collectedCode = newProg();
     Stack *stack = newStack();
+    
+    unsigned int codePos = 0;
     
     while (1) {
         printf("> ");
@@ -68,18 +71,30 @@ void runRepl(void) {
 
         if (strcmp(input, "exit") == 0) {
             printf("Exiting...\n");
+
+            // this doens't seem to print the whole thing
+            printProg(collectedCode);
+            printf("\n");
             break;
         }
         
-        CodePoint *code = progFromString(input);
+        
+        CodePoint *inputCode = progFromString(input);
+        
+        // if there was only one instruction with no
+        // value specified, use 1 - it's a common enough default
+        if (strlen(input) == 1) { inputCode->val = 1; }
+        
         int returnCode = -1;
         int i = 0;
         while (returnCode) {
-            returnCode = step(code[i], stack);
+            collectedCode[codePos++] = inputCode[i];
+            returnCode = step(inputCode[i], stack);
             i++;
         }
+        printf("[ ");
         printStack(*stack);
-        printf("\n");
+        printf("]\n\n");
     }
     
 }

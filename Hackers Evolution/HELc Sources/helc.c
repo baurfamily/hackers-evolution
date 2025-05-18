@@ -22,20 +22,20 @@ int step(CodePoint code, Stack *stack) {
     switch (inst) {
         case NOP: instNOP(val, stack); break;
 //            case RED: return '!';
-//            case DUP: return '"';
+        case DUP: instDUP(val, stack); break;
         case INS: instINS(val, stack); break;
-//            case OUT: return '$';
+        case OUT: instOUT(val, stack); break;
         case SWP: instSWP(val, stack); break;
 //            case AND: return '&';
-//            case INC: return '\'';
+        case INC: instINC(val, stack); break;
 //            case ANC: return '(';
 //            case END: return ')';
         case MUL: instMUL(val, stack); break;
-//            case ADD: return '+';
-//            case DEC: return ',';
-//            case SUB: return '-';
+        case ADD: instADD(val, stack); break;
+        case DEC: instDEC(val, stack); break;
+        case SUB: instSUB(val, stack); break;
 //            case DAT: return '.';
-//            case DIV: return '/';
+        case DIV: instDIV(val, stack); break;
         default:  printf("unmatched instruction\n");
     }
     return inst;
@@ -152,7 +152,6 @@ void printStack(Stack stack) {
         if (stack.values[i] == 0) continue;
         printf("%d ", stack.values[i]);
     }
-    printf("\n");
 }
 
 void printProg(CodePoint *program) {
