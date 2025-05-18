@@ -75,12 +75,9 @@ void instOUT(int val, Program *prog, Stack *stack) {
 }
 
 void instSWP(int val, Program *prog, Stack *stack) {
-    // save current position locally for convinience
-    // must have at least 2 values for this to work
-    if (stack->pos<val) {
-        printf("!Stack underrun in SWP.");
-        return;
-    }
+    // if we don't have enough values to make this work...
+    // just silently exit
+    if (stack->pos<val) { return; }
     
     if (val > 0) {
         char swp = stack->values[stack->pos];
