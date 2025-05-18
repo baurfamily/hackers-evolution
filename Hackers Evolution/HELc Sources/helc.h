@@ -62,14 +62,14 @@ typedef struct Instance {
 char instructionToChar(Instruction inst);
 Instruction charToInstruction(const char c);
 
-int step(CodePoint code, Stack *stack);
-void executeWithStack(CodePoint *code, Stack *stack);
-void execute(CodePoint *code);
+int step(Program *prog, Stack *stack);
+void executeWithStack(Program *prog, Stack *stack);
+void execute(Program *prog);
 void printStack(Stack stack);
-void printProg(CodePoint *program);
+void printProg(Program *program);
 
-CodePoint* newProg(void);
+Program* newProg(void);
 Stack* newStack(void);
 Instance* newInstance(void);
 CodePoint codePointFromString(const char *str);
-CodePoint* progFromString(const char *str);
+Program* progFromString(const char *str);

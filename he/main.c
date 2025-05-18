@@ -25,9 +25,9 @@ int main(int argc, const char * argv[]) {
                 printf("Not enough arguments for execute, please provide the code to execute after option.");
                 return 1;
             }
-            CodePoint *code = progFromString(argv[2]);
-            execute(code);
-            free(code);
+            Program *prog = progFromString(argv[2]);
+            execute(prog);
+            free(prog);
         } else if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--interactive") == 0) {
             runRepl();
         } else {
@@ -55,10 +55,8 @@ void runRepl(void) {
     
     char input[MAX_INPUT_SIZE];
 
-    CodePoint *collectedCode = newProg();
+    Program *prog = newProg();
     Stack *stack = newStack();
-    
-    unsigned int codePos = 0;
     
     while (1) {
         printf("> ");
@@ -73,24 +71,23 @@ void runRepl(void) {
             printf("Exiting...\n");
 
             // this doens't seem to print the whole thing
-            printProg(collectedCode);
+            printProg(prog);
             printf("\n");
             break;
         }
         
         
-        CodePoint *inputCode = progFromString(input);
+        Program *inputProg = progFromString(input);
         
         // if there was only one instruction with no
         // value specified, use 1 - it's a common enough default
-        if (strlen(input) == 1) { inputCode->val = 1; }
+        if (strlen(input) == 1) { inputProg->code[0].val = 1; }
         
         int returnCode = -1;
-        int i = 0;
         while (returnCode) {
-            collectedCode[codePos++] = inputCode[i];
-            returnCode = step(inputCode[i], stack);
-            i++;
+            prog->code[prog->pos] = inputProg->code[inputProg->pos];
+            prog->pos = prog->pos + 1;
+            returnCode = step(inputProg, stack);
         }
         printf("[ ");
         printStack(*stack);

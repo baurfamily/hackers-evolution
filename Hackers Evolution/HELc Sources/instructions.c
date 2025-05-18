@@ -10,20 +10,20 @@
 
 #include <stdio.h>
 
-void instNOP(char val, Stack *stack) {
+void instNOP(char val, Program *prog, Stack *stack) {
     // this space intentionally left blank
 }
 
-void instRED(char val, Stack *stack);
+void instRED(char val, Program *prog, Stack *stack);
 
 //TODO: so much more to implement here...
-void instDUP(char val, Stack *stack) {
+void instDUP(char val, Program *prog, Stack *stack) {
     char dup = stack->values[stack->pos];
     stack->pos++;
     stack->values[stack->pos] = dup;
 }
 
-void instINS(char val, Stack *stack) {
+void instINS(char val, Program *prog, Stack *stack) {
     //TODO: this is super unsafe (can buffer overflow)
     if (stack->pos >= PROG_SIZE) {
         printf("!Stack overrun in INS.");
@@ -33,14 +33,14 @@ void instINS(char val, Stack *stack) {
     stack->values[stack->pos] = val;
 }
 
-void instOUT(char val, Stack *stack) {
+void instOUT(char val, Program *prog, Stack *stack) {
     // this has implicit (and destructive) casting
     printf("%s\n", stack->values);
     
     // need to account for options
 }
 
-void instSWP(char val, Stack *stack) {
+void instSWP(char val, Program *prog, Stack *stack) {
     // save current position locally for convinience
     // must have at least 2 values for this to work
     if (stack->pos<val) {
@@ -58,9 +58,9 @@ void instSWP(char val, Stack *stack) {
     }
 }
 
-void instAND(char val, Stack *stack);
+void instAND(char val, Program *prog, Stack *stack);
 
-void instINC(char val, Stack *stack) {
+void instINC(char val, Program *prog, Stack *stack) {
     // stack overrun implicitly inserts a value
     if (stack->pos<0) {
         stack->pos = 0;
@@ -69,11 +69,19 @@ void instINC(char val, Stack *stack) {
     stack->values[stack->pos] = stack->values[stack->pos] + val;
 };
 
-void instANC(char val, Stack *stack);
+void instANC(char val, Program *prog, Stack *stack) {
+    // note: value ignored
+    if (stack->values[stack->pos] <= 0) {
+        
+    }
+}
 
-void instEND(char val, Stack *stack);
+void instEND(char val, Program *prog, Stack *stack) {
+    // note: value ignored
+}
 
-void instMUL(char val, Stack *stack) {
+
+void instMUL(char val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -102,7 +110,7 @@ void instMUL(char val, Stack *stack) {
     }
 }
 
-void instADD(char val, Stack *stack) {
+void instADD(char val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -131,7 +139,7 @@ void instADD(char val, Stack *stack) {
     }
 }
 
-void instDEC(char val, Stack *stack) {
+void instDEC(char val, Program *prog, Stack *stack) {
     // stack overrun implicitly inserts a value
     if (stack->pos<0) {
         stack->pos = 0;
@@ -140,7 +148,7 @@ void instDEC(char val, Stack *stack) {
     stack->values[stack->pos] = stack->values[stack->pos] - val;
 }
 
-void instSUB(char val, Stack *stack) {
+void instSUB(char val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
@@ -169,9 +177,9 @@ void instSUB(char val, Stack *stack) {
     }
 }
 
-void instDAT(char val, Stack *stack);
+void instDAT(char val, Program *prog, Stack *stack);
 
-void instDIV(char val, Stack *stack) {
+void instDIV(char val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
         printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case

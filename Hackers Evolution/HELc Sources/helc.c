@@ -12,38 +12,41 @@
 #include <stdlib.h>
 #include <string.h>
 
-int step(CodePoint code, Stack *stack) {
-
+int step(Program *prog, Stack *stack) {
+    prog->pos = prog->pos + 1;
+    
+    CodePoint code = prog->code[prog->pos];
     Instruction inst = code.inst;
     char val = code.val;
     
     if (inst==0) return 0;
     
     switch (inst) {
-        case NOP: instNOP(val, stack); break;
+        case NOP: instNOP(val, prog, stack); break;
 //            case RED: return '!';
-        case DUP: instDUP(val, stack); break;
-        case INS: instINS(val, stack); break;
-        case OUT: instOUT(val, stack); break;
-        case SWP: instSWP(val, stack); break;
+        case DUP: instDUP(val, prog, stack); break;
+        case INS: instINS(val, prog, stack); break;
+        case OUT: instOUT(val, prog, stack); break;
+        case SWP: instSWP(val, prog, stack); break;
 //            case AND: return '&';
-        case INC: instINC(val, stack); break;
+        case INC: instINC(val, prog, stack); break;
 //            case ANC: return '(';
 //            case END: return ')';
-        case MUL: instMUL(val, stack); break;
-        case ADD: instADD(val, stack); break;
-        case DEC: instDEC(val, stack); break;
-        case SUB: instSUB(val, stack); break;
+        case MUL: instMUL(val, prog, stack); break;
+        case ADD: instADD(val, prog, stack); break;
+        case DEC: instDEC(val, prog, stack); break;
+        case SUB: instSUB(val, prog, stack); break;
 //            case DAT: return '.';
-        case DIV: instDIV(val, stack); break;
+        case DIV: instDIV(val, prog, stack); break;
         default:  printf("unmatched instruction\n");
     }
+    
     return inst;
 }
 
-void executeWithStack(CodePoint *code, Stack *stack) {
+void executeWithStack(Program *prog, Stack *stack) {
     printf("\nProgram execution!\n");
-    printProg(code);
+    printProg(prog);
     
     // init everything
     for (int i=0; i<PROG_SIZE; i++) {
@@ -52,19 +55,19 @@ void executeWithStack(CodePoint *code, Stack *stack) {
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        int returnCode = step(code[i], stack);
+        int returnCode = step(prog, stack);
         if (returnCode==0) break;
         
         printStack(*stack);
     }
 }
 
-void execute(CodePoint *code) {
+void execute(Program *prog) {
     printf("\nProgram execution!\n");
-    printProg(code);
+    printProg(prog);
     
     Stack stack = { .values={}, .pos=-1 };
-    executeWithStack(code, &stack);
+    executeWithStack(prog, &stack);
 }
 
 Instruction charToInstruction(const char c) {
@@ -111,23 +114,24 @@ char instructionToChar(Instruction inst) {
     }
 }
 
-CodePoint* newProg(void) {
-    CodePoint *code = (CodePoint *)malloc(sizeof(CodePoint)*(PROG_SIZE+1));
+Program* newProg(void) {
+    Program* prog = (Program *)malloc(sizeof(Program));
+    prog->pos = -1;
     
     // initialize array to null
     for (int i=0; i<PROG_SIZE; i++) {
-        code[i] = (CodePoint){ .inst=0, .val=0 };
+        prog->code[i] = (CodePoint){ .inst=0, .val=0 };
     }
     
-    return code;
+    return prog;
 }
 
 Stack* newStack(void) {
     Stack *stack = (Stack *)malloc(sizeof(Stack));
+    stack->pos = -1;
     
     for (int i=0; i<PROG_SIZE; i++) {
         stack->values[i] = 0;
-        stack->pos = -1;
     }
     
     return stack;
@@ -154,26 +158,26 @@ void printStack(Stack stack) {
     }
 }
 
-void printProg(CodePoint *program) {
+void printProg(Program *prog) {
     char str[PROG_SIZE*2 + 1];
     char val[PROG_SIZE*2 + 1];
     
     for (int i=0; i<PROG_SIZE; i++) {
-        Instruction inst = program[i].inst;
+        Instruction inst = prog->code[i].inst;
         char c = instructionToChar(inst);
         str[i] = c;
-        val[i] = (int)program[i].val;
+        val[i] = (int)prog->code[i].val;
         if (inst == 0)
             break;
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        if (program[i].inst == 0) break;
+        if (prog->code[i].inst == 0) break;
         printf("%c%d ", str[i], val[i]);
     
         if ((i+1)%8 == 0) printf("\n");
         
-        if (program[i].inst == 0) break;
+        if (prog->code[i].inst == 0) break;
     }
 }
 
@@ -184,20 +188,20 @@ CodePoint codePointFromString(const char *str) {
     };
 }
 
-CodePoint* progFromString(const char *str) {
-    CodePoint *code = newProg();
+Program* progFromString(const char *str) {
+    Program *prog = newProg();
     
     unsigned long length = strlen(str);
 
     int j=0;
     for (int i=0; i<length; i+=2) {
-        code[j] = (CodePoint) {
+        prog->code[j] = (CodePoint) {
             .inst = charToInstruction(str[i]),
             .val = (unsigned int)strtol(&str[i+1], NULL, 16)
         };
         j++;
     }
-    code[j] = (CodePoint){ .inst=0, .val=0 };
+    prog->code[j] = (CodePoint){ .inst=0, .val=0 };
     
-    return code;
+    return prog;
 }
