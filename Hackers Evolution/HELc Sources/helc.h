@@ -61,6 +61,7 @@ typedef struct Instance {
 
 char instructionToChar(Instruction inst);
 Instruction charToInstruction(const char c);
+int defaultForInstruction(Instruction inst);
 
 int step(Program *prog, Stack *stack, int additionalValue);
 void executeWithStack(Program *prog, Stack *stack);

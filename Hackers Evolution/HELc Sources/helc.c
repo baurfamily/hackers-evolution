@@ -5,12 +5,13 @@
 //  Created by Eric Baur on 5/11/25.
 //
 
-#include "helc.h"
-#include "instructions.h"
-
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "helc.h"
+#include "instructions.h"
 
 int step(Program *prog, Stack *stack, int additionalVal) {
     prog->pos = prog->pos + 1;
@@ -89,6 +90,28 @@ Instruction charToInstruction(const char c) {
         case '.': return DAT;
         case '/': return DIV;
         default:  return NOP;
+    }
+}
+
+int defaultForInstruction(Instruction inst) {
+    switch (inst) {
+        case NOP: return 0;
+        case RED: return 1;
+        case DUP: return 0;
+        case INS: return 0;
+        case OUT: return 0;
+        case SWP: return 1;
+        case AND: return 10; // no idea on this one
+        case INC: return 1;
+        case ANC: return 0;
+        case END: return 0;
+        case MUL: return 1;
+        case ADD: return 1;
+        case DEC: return 1;
+        case SUB: return 1;
+        case DAT: return 1;
+        case DIV: return 1;
+        default:  return 0;
     }
 }
 
@@ -191,13 +214,25 @@ Program* progFromString(const char *str) {
     Program *prog = newProg();
     
     unsigned long length = strlen(str);
+    
 
     int j=0;
-    for (int i=0; i<length; i+=2) {
-        prog->code[j] = (CodePoint) {
-            .inst = charToInstruction(str[i]),
-            .val = (unsigned int)strtol(&str[i+1], NULL, 16)
-        };
+    for (int i=0; i<length; i++) {
+        char *endptr;
+        errno = 0;
+        Instruction inst = charToInstruction(str[i]);
+        int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
+        
+        if (errno == 0) {
+            // no error on conversion means we found a value
+            // no increment the parsing position
+            i++;
+        } else {
+            // otherwise, go looking for a reasonable default value
+            val = defaultForInstruction(inst);
+        }
+        
+        prog->code[j] = (CodePoint) {.inst=inst, .val=val };
         j++;
     }
     prog->code[j] = (CodePoint){ .inst=0, .val=0 };
