@@ -62,6 +62,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"HELc Sources/helc.c",
+				"HELc Sources/instructions.c",
 			);
 			target = 3F493C492DD45F3F0096BC53 /* he */;
 		};

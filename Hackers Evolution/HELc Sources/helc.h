@@ -27,12 +27,12 @@ typedef enum Instruction {
             // 0100 = output as a number (default: assume ASCII
             // 0010 =
             // 0001 = reverse string
-    SWP,    // % - swaps top 2 values on the stack
+    SWP,    // % - swaps 2 values on the stack: the top value and the value at top-<value>: 0 drops top value (swap with nothing?)
     AND,    // & - allows the <value> of this cell to bit-wise concat with the next <value>, using the instruction in the next code point for the next instruction
     INC,    // ' - increment current value on the stack by <value>, replace stack entry
     ANC,    // ( - start of looping construct/conditional, if stack is zero or less jumps just past matching END
     END,    // ) - jumps back to anchor, maybe? does the <value> matter? maybe a bitmask?
-    MUL,    // * - multiple current stack entry by second stack entry; consume both values and push answer to the stack
+    MUL,    // * - multiple current stack entry by the stack entry pointed to my <value>; consume both values and push answer to the stack
     ADD,    // + - add current stack entry to second stack entry; consume both values and push answer to the stack
     DEC,    // ' - decrement the current value on the stack by <value>; replace stack entry
     SUB,    // - - reduces current stack entry by <value; replace stack entry
@@ -60,11 +60,15 @@ typedef struct Instance {
 } Instance;
 
 char instructionToChar(Instruction inst);
-Instruction charToInstruction(char c);
+Instruction charToInstruction(const char c);
 
+int step(CodePoint code, Stack *stack);
 void execute(CodePoint *code);
+void printStack(Stack stack);
 void printProg(CodePoint *program);
 
 CodePoint* newProg(void);
+Stack* newStack(void);
 Instance* newInstance(void);
-CodePoint* progFromString(char *str);
+CodePoint codePointFromString(const char *str);
+CodePoint* progFromString(const char *str);

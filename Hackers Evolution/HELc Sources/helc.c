@@ -12,18 +12,56 @@
 #include <stdlib.h>
 #include <string.h>
 
-void execute(CodePoint *code) {
-    printf("\nProgram execution!\n");
+int step(CodePoint code, Stack *stack) {
+
+    Instruction inst = code.inst;
+    char val = code.val;
     
-    for (int i=0; i<PROG_SIZE; i++) {
-        
+    if (inst==0) return 0;
+    
+    switch (inst) {
+        case NOP: instNOP(val, stack); break;
+//            case RED: return '!';
+//            case DUP: return '"';
+        case INS: instINS(val, stack); break;
+//            case OUT: return '$';
+        case SWP: instSWP(val, stack); break;
+//            case AND: return '&';
+//            case INC: return '\'';
+//            case ANC: return '(';
+//            case END: return ')';
+        case MUL: instMUL(val, stack); break;
+//            case ADD: return '+';
+//            case DEC: return ',';
+//            case SUB: return '-';
+//            case DAT: return '.';
+//            case DIV: return '/';
+        default:  printf("unmatched instruction");
     }
-    
-    printProg(code);
-    
+    return inst;
 }
 
-Instruction charToInstruction(char c) {
+void execute(CodePoint *code) {
+    printf("\nProgram execution!\n");
+    printProg(code);
+    
+    Stack stack = { .values={}, .pos=-1 };
+    // init everything
+    for (int i=0; i<PROG_SIZE; i++) {
+        stack.values[i] = 0;
+        stack.pos = -1;
+    }
+    
+    
+    for (int i=0; i<PROG_SIZE; i++) {
+        int returnCode = step(code[i], &stack);
+        if (returnCode==0) break;
+        
+        printStack(stack);
+    }
+}
+
+Instruction charToInstruction(const char c) {
     switch (c) {
         case ' ': return NOP;
         case '!': return RED;
@@ -78,6 +116,17 @@ CodePoint* newProg(void) {
     return code;
 }
 
+Stack* newStack(void) {
+    Stack *stack = (Stack *)malloc(sizeof(Stack));
+    
+    for (int i=0; i<PROG_SIZE; i++) {
+        stack->values[i] = 0;
+        stack->pos = -1;
+    }
+    
+    return stack;
+}
+
 Instance* newInstance(void) {
     Instance *instance = (Instance *)malloc(sizeof(Instance));
     
@@ -90,6 +139,14 @@ Instance* newInstance(void) {
     }
     
     return instance;
+}
+
+void printStack(Stack stack) {
+    for (int i=stack.pos; i>=0; i--) {
+        if (stack.values[i] == 0) continue;
+        printf("%d ", stack.values[i]);
+    }
+    printf("\n");
 }
 
 void printProg(CodePoint *program) {
@@ -115,7 +172,14 @@ void printProg(CodePoint *program) {
     }
 }
 
-CodePoint* progFromString(char *str) {
+CodePoint codePointFromString(const char *str) {
+    return (CodePoint) {
+        .inst = charToInstruction(str[0]),
+        .val = (unsigned int)strtol(&str[1], NULL, 16)
+    };
+}
+
+CodePoint* progFromString(const char *str) {
     CodePoint *code = newProg();
     
     unsigned long length = strlen(str);

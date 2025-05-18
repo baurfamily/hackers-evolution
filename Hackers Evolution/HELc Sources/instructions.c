@@ -5,40 +5,139 @@
 //  Created by Eric Baur on 5/15/25.
 //
 
+#include "helc.h"
+#include "instructions.h"
 
-void instNOP(char val, char **stack, int *stackPos) {
+#include <stdio.h>
+
+void instNOP(char val, Stack *stack) {
     // this space intentionally left blank
 }
 
-void instRED(char val, char **stack);
+void instRED(char val, Stack *stack);
 
-void instDUP(char val, char **stack);
-
-void instINS(char val, char **stack) {
-    
+//TODO: so much more to implement here...
+void instDUP(char val, Stack *stack) {
+    char dup = stack->values[stack->pos];
+    stack->pos++;
+    stack->values[stack->pos] = dup;
 }
 
-void instOUT(char val, char **stack);
+void instINS(char val, Stack *stack) {
+    //TODO: this is super unsafe (can buffer overflow)
+    if (stack->pos >= PROG_SIZE) {
+        printf("!Stack overrun in INS.");
+        return;
+    }
+    stack->pos++;
+    stack->values[stack->pos] = val;
+}
 
-void instSWP(char val, char **stack);
+void instOUT(char val, Stack *stack);
 
-void instAND(char val, char **stack);
+void instSWP(char val, Stack *stack) {
+    // save current position locally for convinience
+    // must have at least 2 values for this to work
+    if (stack->pos<val) {
+        printf("!Stack underrun in SWP.");
+        return;
+    }
+    
+    if (val > 0) {
+        char swp = stack->values[stack->pos];
+        stack->values[stack->pos] = stack->values[stack->pos-val];
+        stack->values[stack->pos-val] = swp;
+    } else {
+        stack->values[stack->pos] = 0;
+        stack->pos--;
+    }
+}
 
-void instINC(char val, char **stack);
+void instAND(char val, Stack *stack);
 
-void instANC(char val, char **stack);
+void instINC(char val, Stack *stack) {
+    // must have at least 1 value for this to work
+    if (stack->pos<0) {
+        printf("!Stack underrun in DEC.");
+        return;
+    }
+    stack->values[stack->pos]--;
+};
 
-void instEND(char val, char **stack);
+void instANC(char val, Stack *stack);
 
-void instMUL(char val, char **stack);
+void instEND(char val, Stack *stack);
 
-void instADD(char val, char **stack);
+void instMUL(char val, Stack *stack) {
+    if (stack->pos<val) {
+        printf("Stack underrun in MUL.");
+        // for "safety" we reset to a simple case
+        val = (stack->pos<1 ? 1 : 0);
+    }
+    
+    // save off relevant values
+    int first = stack->values[stack->pos];
+    int second = (val>0 ? stack->values[stack->pos-val] : first);
 
-void instDEC(char val, char **stack);
+    // shift values, if necessary, to cover the consumed value
+    for (int i=1; i<val; i++) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    }
+    
+    if (val>0) {
+        // save result
+        stack->values[stack->pos-1] = first * second;
+        
+        // reduce stack
+        stack->values[stack->pos] = 0;
+        stack->pos--;
+    } else {
+        // if val points to top of stack, square it in place
+        stack->values[stack->pos] = first * first;
+    }
+}
 
-void instSUB(char val, char **stack);
+void instADD(char val, Stack *stack) {
+    // must have at least 2 values for this to work
+    if (stack->pos<1) {
+        printf("Stack underrun in MUL.");
+        return;
+    }
+    stack->values[stack->pos] = stack->values[stack->pos-1];
+    stack->values[stack->pos-1] = stack->values[stack->pos] + stack->values[stack->pos-1];
+    stack->pos--;
+}
 
-void instDAT(char val, char **stack);
+void instDEC(char val, Stack *stack) {
+    // must have at least 1 value for this to work
+    if (stack->pos<0) {
+        printf("Stack underrun in DEC.");
+        return;
+    }
+    stack->values[stack->pos]--;
+}
 
-void instDIV(char val, char **stack);
+void instSUB(char val, Stack *stack) {
+    // must have at least 2 values for this to work
+    if (stack->pos<1) {
+        printf("Stack underrun in MUL.");
+        return;
+    }
+    stack->values[stack->pos] = stack->values[stack->pos-1];
+    stack->values[stack->pos-1] = stack->values[stack->pos] - stack->values[stack->pos-1];
+    stack->pos--;
+}
+
+void instDAT(char val, Stack *stack);
+
+void instDIV(char val, Stack *stack) {
+    // must have at least 2 values for this to work
+    if (stack->pos<1) {
+        printf("Stack underrun in MUL.");
+        return;
+    }
+    stack->values[stack->pos] = stack->values[stack->pos-1];
+    stack->values[stack->pos-1] = stack->values[stack->pos] / stack->values[stack->pos-1];
+    stack->pos--;
+}
 
