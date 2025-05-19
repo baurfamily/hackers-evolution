@@ -25,7 +25,7 @@ typedef enum Instruction {
             // 0000 = defaults: outputs entire stack (null-terminated) as ASCII string
             // 1000 = output first value (default: null-terminated)
             // 0100 = output as a number (default: assume ASCII
-            // 0010 =
+            // 0010 = ???
             // 0001 = reverse string
     SWP,    // % - swaps 2 values on the stack: the top value and the value at top-<value>: 0 drops top value (swap with nothing?)
     AND,    // & - allows the <value> of this cell to bit-wise concat with the next <value>, using the instruction in the next code point for the next instruction. This allows for entering hexidecimal values directly, for example

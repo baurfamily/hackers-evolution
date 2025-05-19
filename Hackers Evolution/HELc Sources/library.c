@@ -14,7 +14,7 @@
 #endif
 
 int l_mul(lua_State *L) {
-  char n1 = luaL_checkstring(<#L#>, 1);
+  lua_Integer n1 = luaL_checkinteger(L, 1);
   lua_Integer n2 = luaL_checkinteger(L, 2);
 
   lua_pushinteger(L, n1 * n2);

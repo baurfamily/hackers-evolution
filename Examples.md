@@ -2,6 +2,10 @@
 
 ## HELC Language examples
 
+### Bugs
+
+* Currently, if you insert a # as the only instruction in the REPL, it will insert a 1 intead of a 0.
+
 ## Comments
 
 Not considered part of the language, per se, but you can use `:` and `;` to mark the beginning/end of comments. Whitespace is already considered no-ops, so you can have newlines in the program and/or comments.
@@ -20,10 +24,10 @@ Leaves stack as:
 [ 1 1 1 1 1 1 1 1 1 1 ]
 ```
 
-Similar compressed version:
+Similar compressed version (inserts 0s):
 
 ```
-#A(#1%,)%0
+#A(#%,)%0
 ```
 
 General loop strategy: `#A(0 ------ %1,1)0%0`
@@ -48,6 +52,12 @@ This starts a loop, checking against the current stack value, drops that value a
 
 ```
 (0%0)0 
+```
+
+To clear the entire stack, you can use the stack-based loop, which continues as long as there are stack variables:
+
+```
+(1%0)1
 ```
 
 ## Hello, world
@@ -104,40 +114,22 @@ But we need to do this to each value in the existing stack, which will require a
 
 ## adding things...
 
+Put two numbers on the stack and add them:
+```
+#2#3+1
+```
+
+Add a number to itself"
+
+```
+#5+0
+```
+
+Add top number to third number:
+
+
 ```
 #1#2#3#4#5#6#7#8#9
 +2
 ```
 
-
-# Old stuff
-## Hello
-
-Note: This example shows how to run it via lua, after this example we'll only have the HELa code, without the boilerplate
-
-```
-hela = HELa:new()
-
-hela:setProgram([[
-= H
-= e
-= l
-= l
-= o
-]])
-
-hela:execute()
-str = hela:print()
-```
-
-`str` will container "Hello"
-
-or, more succinctly:
-
-```
-hela = HELa:new(""= H = e = l = l = o"")
-hela:execute()
-str = hela:print()
-```
-
-## 

@@ -238,7 +238,7 @@ Program* progFromString(const char *str) {
                     // otherwise, go looking for a reasonable default value
                     val = defaultForInstruction(inst);
                 }
-                
+//                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }

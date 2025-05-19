@@ -179,11 +179,11 @@ void instMUL(int val, Program *prog, Stack *stack) {
     
     // save off relevant values
     int first = stack->values[stack->pos];
-    int second = (val>0 ? stack->values[stack->pos-val] : first);
+    int second = stack->values[stack->pos-val];
 
     // shift values, if necessary, to cover the consumed value
-    for (int i=1; i<val; i++) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    for (int i=val; i>0; i--) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
     }
     
     if (val>0) {
@@ -208,11 +208,11 @@ void instADD(int val, Program *prog, Stack *stack) {
     
     // save off relevant values
     int first = stack->values[stack->pos];
-    int second = (val>0 ? stack->values[stack->pos-val] : first);
+    int second = stack->values[stack->pos-val];
 
     // shift values, if necessary, to cover the consumed value
-    for (int i=1; i<val; i++) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    for (int i=val; i>0; i--) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
     }
     
     if (val>0) {
@@ -239,18 +239,18 @@ void instDEC(int val, Program *prog, Stack *stack) {
 
 void instSUB(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
-        printf("Stack underrun in MUL.");
+        printf("Stack underrun in SUb.");
         // for "safety" we reset to a simple case
         val = (stack->pos<1 ? 1 : 0);
     }
     
     // save off relevant values
     int first = stack->values[stack->pos];
-    int second = (val>0 ? stack->values[stack->pos-val] : first);
+    int second = stack->values[stack->pos-val];
 
     // shift values, if necessary, to cover the consumed value
-    for (int i=1; i<val; i++) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    for (int i=val; i>0; i--) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
     }
     
     if (val>0) {
@@ -277,11 +277,11 @@ void instDIV(int val, Program *prog, Stack *stack) {
     
     // save off relevant values
     int first = stack->values[stack->pos];
-    int second = (val>0 ? stack->values[stack->pos-val] : first);
+    int second = stack->values[stack->pos-val];
 
     // shift values, if necessary, to cover the consumed value
-    for (int i=1; i<val; i++) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i];
+    for (int i=val; i>0; i--) {
+        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
     }
     
     if (val>0) {
