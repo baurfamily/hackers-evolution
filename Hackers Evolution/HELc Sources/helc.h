@@ -34,10 +34,10 @@ typedef enum Instruction {
     END,    // ) - jumps back to anchor, maybe? does the <value> matter? maybe a bitmask?
             // By default, jumps back to matching ANC if stack value is non-zero
             // If <value> is non-zero, consumes that number of stack values instead and jumps if there are values left.
-    MUL,    // * - multiple current stack entry by the stack entry pointed to my <value>; consume both values and push answer to the stack
-    ADD,    // + - add current stack entry to second stack entry; consume both values and push answer to the stack
+    MUL,    // * - multiple current stack entry by the stack entry pointed to my <value>; consume top value and push answer to the stack at <value>
+    ADD,    // + - add current stack entry to second stack entry; consume top value and push answer to the stack at <value>
     DEC,    // ' - decrement the current value on the stack by <value>; replace stack entry
-    SUB,    // - - reduces current stack entry by <value; replace stack entry
+    SUB,    // - - reduces current <value> stack entry by top entry; consume top entry
     DAT,    // . - the next <value> code points should be interpreted as ASCII data values
     DIV     // / - divide current stack entry by <value> (with tuncation); replace stack entry
 } Instruction;

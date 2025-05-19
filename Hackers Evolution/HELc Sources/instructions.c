@@ -172,23 +172,17 @@ void findANC(Program *prog) {
 
 void instMUL(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
-        printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 1 : 0);
+        val = (stack->pos<1 ? 0 : 1);
     }
     
     // save off relevant values
     int first = stack->values[stack->pos];
     int second = stack->values[stack->pos-val];
-
-    // shift values, if necessary, to cover the consumed value
-    for (int i=val; i>0; i--) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
-    }
     
     if (val>0) {
         // save result
-        stack->values[stack->pos-1] = second * first;
+        stack->values[stack->pos-val] = second * first;
         
         // reduce stack
         stack->values[stack->pos] = 0;
@@ -201,23 +195,17 @@ void instMUL(int val, Program *prog, Stack *stack) {
 
 void instADD(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
-        printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 1 : 0);
+        val = (stack->pos<1 ? 0 : 1);
     }
     
     // save off relevant values
     int first = stack->values[stack->pos];
     int second = stack->values[stack->pos-val];
-
-    // shift values, if necessary, to cover the consumed value
-    for (int i=val; i>0; i--) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
-    }
     
     if (val>0) {
         // save result
-        stack->values[stack->pos-1] = second + first;
+        stack->values[stack->pos-val] = second + first;
         
         // reduce stack
         stack->values[stack->pos] = 0;
@@ -239,23 +227,17 @@ void instDEC(int val, Program *prog, Stack *stack) {
 
 void instSUB(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
-        printf("Stack underrun in SUb.");
         // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 1 : 0);
+        val = (stack->pos<1 ? 0 : 1);
     }
     
     // save off relevant values
     int first = stack->values[stack->pos];
     int second = stack->values[stack->pos-val];
 
-    // shift values, if necessary, to cover the consumed value
-    for (int i=val; i>0; i--) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
-    }
-    
     if (val>0) {
         // save result
-        stack->values[stack->pos-1] = second - first;
+        stack->values[stack->pos-val] = second - first;
         
         // reduce stack
         stack->values[stack->pos] = 0;
@@ -270,23 +252,17 @@ void instDAT(int val, Program *prog, Stack *stack);
 
 void instDIV(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {
-        printf("Stack underrun in MUL.");
         // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 1 : 0);
+        val = (stack->pos<1 ? 0 : 1);
     }
     
     // save off relevant values
     int first = stack->values[stack->pos];
     int second = stack->values[stack->pos-val];
-
-    // shift values, if necessary, to cover the consumed value
-    for (int i=val; i>0; i--) {
-        stack->values[stack->pos-i] = stack->values[stack->pos-i+1];
-    }
     
     if (val>0) {
         // save result
-        stack->values[stack->pos-1] = second / first;
+        stack->values[stack->pos-val] = second / first;
         
         // reduce stack
         stack->values[stack->pos] = 0;
