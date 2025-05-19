@@ -104,28 +104,57 @@ void instINC(int val, Program *prog, Stack *stack) {
 
 void instANC(int val, Program *prog, Stack *stack) {
 //    printf("compare %d to %d", val, stack->values[stack->pos]);
-    // stack index out of bounds ends loop
-    if (stack->pos < val || stack->values[stack->pos-val] <= 0) {
-        int anchorCount = 1;
-        bool endFound = false;
-        while (!endFound && prog->pos < PROG_SIZE) {
-            prog->pos = prog->pos + 1;
-            switch (prog->code[prog->pos].inst) {
-                case ANC:
-                    anchorCount++;
-                case END:
-                    anchorCount--;
-                    if (anchorCount <= 0)
-                        endFound = true;
-            }
+    
+    // value decides if we're looking at the top value of the stack or the amount of things *in* the stack
+    if (val>0) {
+        // asking for 1 value means stack position is at least 0
+        if (stack->pos<(val-1)) {
+            findEND(prog);
+        }
+    } else {
+        // stack index out of bounds ends loop
+        if (stack->pos < val || stack->values[stack->pos-val] <= 0) {
+            findEND(prog);
+        }
+    }
+}
+
+void findEND(Program *prog) {
+    int anchorCount = 1;
+    bool endFound = false;
+    while (!endFound && prog->pos < PROG_SIZE) {
+        prog->pos = prog->pos + 1;
+        switch (prog->code[prog->pos].inst) {
+            case ANC:
+                anchorCount++;
+            case END:
+                anchorCount--;
+                if (anchorCount <= 0)
+                    endFound = true;
         }
     }
 }
 
 void instEND(int val, Program *prog, Stack *stack) {
-    // note: value currently ignored
+    // if stack is empty, there is nothing to do!
+    if (stack->pos<0 ) {
+        return;
+    }
+    
+    // default case, auto-decrement
+    if (val==0) {
+        // and then exit if stack value is 0 or less
+        if (stack->values[stack->pos] <= 0) {
+            return;
+        }
+    }
+    findANC(prog);
+}
+
+void findANC(Program *prog) {
     int anchorCount = 1;
     bool endFound = false;
+    
     while (!endFound && prog->pos >= 0) {
         prog->pos = prog->pos - 1;
         switch (prog->code[prog->pos].inst) {
@@ -140,7 +169,6 @@ void instEND(int val, Program *prog, Stack *stack) {
     // decrement one more so the ANC executes next
     prog->pos = prog->pos - 1;
 }
-
 
 void instMUL(int val, Program *prog, Stack *stack) {
     if (stack->pos<val) {

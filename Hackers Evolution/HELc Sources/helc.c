@@ -6,6 +6,7 @@
 //
 
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -214,26 +215,34 @@ Program* progFromString(const char *str) {
     Program *prog = newProg();
     
     unsigned long length = strlen(str);
-    
 
     int j=0;
+    bool comment = false;
     for (int i=0; i<length; i++) {
-        char *endptr;
-        errno = 0;
-        Instruction inst = charToInstruction(str[i]);
-        int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
-        
-        if (errno == 0) {
-            // no error on conversion means we found a value
-            // no increment the parsing position
-            i++;
+        if (str[i] == ':') {
+            comment = true;
+        } else if (str[i] == ';') {
+            comment = false;
         } else {
-            // otherwise, go looking for a reasonable default value
-            val = defaultForInstruction(inst);
+            if (!comment) {
+                char *endptr;
+                errno = 0;
+                Instruction inst = charToInstruction(str[i]);
+                int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
+                
+                if (errno == 0) {
+                    // no error on conversion means we found a value
+                    // no increment the parsing position
+                    i++;
+                } else {
+                    // otherwise, go looking for a reasonable default value
+                    val = defaultForInstruction(inst);
+                }
+                
+                prog->code[j] = (CodePoint) {.inst=inst, .val=val };
+                j++;
+            }
         }
-        
-        prog->code[j] = (CodePoint) {.inst=inst, .val=val };
-        j++;
     }
     prog->code[j] = (CodePoint){ .inst=0, .val=0 };
     

@@ -2,6 +2,14 @@
 
 ## HELC Language examples
 
+## Comments
+
+Not considered part of the language, per se, but you can use `:` and `;` to mark the beginning/end of comments. Whitespace is already considered no-ops, so you can have newlines in the program and/or comments.
+
+Comment markers are not paired, so any number are starting `:s are still ended by a single `;` (also, that means individual `;`s are ignored).
+
+Currently the parser removes all comemnts before executing the program, so they won't affect running code in any way.
+
 Looping
 ```
 #A(0#1%1,1)0%0
@@ -10,6 +18,12 @@ Looping
 Leaves stack as:
 ```
 [ 1 1 1 1 1 1 1 1 1 1 ]
+```
+
+Similar compressed version:
+
+```
+#A(#1%,)%0
 ```
 
 General loop strategy: `#A(0 ------ %1,1)0%0`
@@ -27,10 +41,14 @@ General loop strategy: `#A(0 ------ %1,1)0%0`
 ### Clearing the stack:
 
 ```
-(0%0)
+(%0)
 ```
 
-This starts a loop, checking against the current stack value, drops that value and ten loops back. This will clear out any-non-zero values up to the first zero. 
+This starts a loop, checking against the current stack value, drops that value and ten loops back. This will clear out any-non-zero values up to the first zero. Expanded version:
+
+```
+(0%0)0 
+```
 
 ## Hello, world
 

@@ -90,6 +90,7 @@ void runRepl(void) {
             returnCode = step(inputProg, stack, 0);
             // #A(0#1%1,1)0#2
             
+            // step-wise stack printing...
 //            printf("%d => [ ", returnCode);
 //            printStack(*stack);
 //            printf("]\n\n");

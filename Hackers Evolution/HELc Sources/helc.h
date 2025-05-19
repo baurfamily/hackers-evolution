@@ -30,8 +30,10 @@ typedef enum Instruction {
     SWP,    // % - swaps 2 values on the stack: the top value and the value at top-<value>: 0 drops top value (swap with nothing?)
     AND,    // & - allows the <value> of this cell to bit-wise concat with the next <value>, using the instruction in the next code point for the next instruction. This allows for entering hexidecimal values directly, for example
     INC,    // ' - increment current value on the stack by <value>, replace stack entry
-    ANC,    // ( - start of looping construct/conditional, if stack is zero or less jumps just past matching END. Looks at the stack position specified by <value> (0 is top of stack / current value)
+    ANC,    // ( - start of looping construct/conditional, if stack is zero or less jumps just past matching END. If <value> is set to something non-zero, it jumps if there are less than that number of values in the stack.
     END,    // ) - jumps back to anchor, maybe? does the <value> matter? maybe a bitmask?
+            // By default, jumps back to matching ANC if stack value is non-zero
+            // If <value> is non-zero, consumes that number of stack values instead and jumps if there are values left.
     MUL,    // * - multiple current stack entry by the stack entry pointed to my <value>; consume both values and push answer to the stack
     ADD,    // + - add current stack entry to second stack entry; consume both values and push answer to the stack
     DEC,    // ' - decrement the current value on the stack by <value>; replace stack entry
