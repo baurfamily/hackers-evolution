@@ -56,7 +56,7 @@ void runRepl(void) {
     char input[MAX_INPUT_SIZE];
 
     Program *prog = newProg();
-    Stack *stack = newStack();
+    Tape *tape = newTape();
     
     while (1) {
         printf("> ");
@@ -87,7 +87,7 @@ void runRepl(void) {
         while (returnCode) {
             prog->code[prog->pos] = inputProg->code[inputProg->pos];
             prog->pos = prog->pos + 1;
-            returnCode = step(inputProg, stack, 0);
+            returnCode = step(inputProg, tape, 0);
             // #A(0#1%1,1)0#2
             
             // step-wise stack printing...
@@ -95,9 +95,9 @@ void runRepl(void) {
 //            printStack(*stack);
 //            printf("]\n\n");
         }
-        printf("[ ");
-        printStack(*stack);
-        printf("]\n\n");
+        
+        printTape(*tape);
+        printf("\n");
     }
     
 }

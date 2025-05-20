@@ -40,7 +40,16 @@ General loop strategy: `#A(0 ------ %1,1)0%0`
 * `)0` - mark the end of the loop (value is ignored)
 * `%0` - drop the loop variable, as it's no longer needed
 
-## Working with the stack.
+## Working with the tape.
+
+## Math
+
+Adding numbers 1-4:
+
+```
+#1#2#3#4+++
+```
+
 
 ### Clearing the stack:
 

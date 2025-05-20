@@ -14,9 +14,7 @@
 #include "helc.h"
 #include "instructions.h"
 
-int step(Program *prog, Stack *stack, int additionalVal) {
-    prog->pos = prog->pos + 1;
-    
+int step(Program *prog, Tape *tape, int additionalVal) {
     CodePoint code = prog->code[prog->pos];
     Instruction inst = code.inst;
     unsigned int val = code.val + (additionalVal << 4);
@@ -24,43 +22,44 @@ int step(Program *prog, Stack *stack, int additionalVal) {
     if (inst==0) return 0;
     
     switch (inst) {
-        case NOP: instNOP(val, prog, stack); break;
+        case NOP: instNOP(val, prog, tape); break;
 //            case RED: return '!';
-        case DUP: instDUP(val, prog, stack); break;
-        case INS: instINS(val, prog, stack); break;
-        case OUT: instOUT(val, prog, stack); break;
-        case SWP: instSWP(val, prog, stack); break;
-        case AND: instAND(val, prog, stack); break;
-        case INC: instINC(val, prog, stack); break;
-        case ANC: instANC(val, prog, stack); break;
-        case END: instEND(val, prog, stack); break;
-        case MUL: instMUL(val, prog, stack); break;
-        case ADD: instADD(val, prog, stack); break;
-        case DEC: instDEC(val, prog, stack); break;
-        case SUB: instSUB(val, prog, stack); break;
+        case DUP: instDUP(val, prog, tape); break;
+        case INS: instINS(val, prog, tape); break;
+        case OUT: instOUT(val, prog, tape); break;
+        case SWP: instSWP(val, prog, tape); break;
+        case AND: instAND(val, prog, tape); break;
+        case INC: instINC(val, prog, tape); break;
+        case ANC: instANC(val, prog, tape); break;
+        case END: instEND(val, prog, tape); break;
+        case MUL: instMUL(val, prog, tape); break;
+        case ADD: instADD(val, prog, tape); break;
+        case DEC: instDEC(val, prog, tape); break;
+        case SUB: instSUB(val, prog, tape); break;
 //            case DAT: return '.';
-        case DIV: instDIV(val, prog, stack); break;
+        case DIV: instDIV(val, prog, tape); break;
         default:  printf("unmatched instruction\n");
     }
+    prog->pos = prog->pos + 1;
     
     return inst;
 }
 
-void executeWithStack(Program *prog, Stack *stack) {
+void executeWithTape(Program *prog, Tape *tape) {
     printf("\nProgram execution!\n");
     printProg(prog);
     
     // init everything
     for (int i=0; i<PROG_SIZE; i++) {
-        stack->values[i] = 0;
-        stack->pos = -1;
+        tape->values[i] = 0;
+        tape->pos = 0;
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        int returnCode = step(prog, stack, 0);
+        int returnCode = step(prog, tape, 0);
         if (returnCode==0) break;
         
-        printStack(*stack);
+        printTape(*tape);
     }
 }
 
@@ -68,8 +67,8 @@ void execute(Program *prog) {
     printf("\nProgram execution!\n");
     printProg(prog);
     
-    Stack stack = { .values={}, .pos=-1 };
-    executeWithStack(prog, &stack);
+    Tape tape = { .values={}, .pos=0 };
+    executeWithTape(prog, &tape);
 }
 
 Instruction charToInstruction(const char c) {
@@ -140,7 +139,7 @@ char instructionToChar(Instruction inst) {
 
 Program* newProg(void) {
     Program* prog = (Program *)malloc(sizeof(Program));
-    prog->pos = -1;
+    prog->pos = 0;
     
     // initialize array to null
     for (int i=0; i<PROG_SIZE; i++) {
@@ -150,15 +149,15 @@ Program* newProg(void) {
     return prog;
 }
 
-Stack* newStack(void) {
-    Stack *stack = (Stack *)malloc(sizeof(Stack));
-    stack->pos = -1;
+Tape* newTape(void) {
+    Tape *tape = (Tape *)malloc(sizeof(Tape));
+    tape->pos = 0;
     
     for (int i=0; i<PROG_SIZE; i++) {
-        stack->values[i] = 0;
+        tape->values[i] = 0;
     }
     
-    return stack;
+    return tape;
 }
 
 Instance* newInstance(void) {
@@ -167,18 +166,26 @@ Instance* newInstance(void) {
     // init everything
     for (int i=0; i<PROG_SIZE; i++) {
         instance->prog.code[i] = (CodePoint){ .inst=0, .val=0 };
-        instance->prog.pos = -1;
-        instance->stack.values[i] = 0;
-        instance->stack.pos = -1;
+        instance->prog.pos = 0;
+        instance->tape.values[i] = 0;
+        instance->tape.pos = 0;
     }
     
     return instance;
 }
 
-void printStack(Stack stack) {
-    for (int i=stack.pos; i>=0; i--) {
-        printf("%d ", stack.values[i]);
+void printTape(Tape tape) {
+    printf("[... ");
+    for (int i=tape.pos-10; i<=tape.pos+10; i++) {
+        int index = ((i > 0 ? i : TAPE_SIZE+i) % TAPE_SIZE);
+        if (i==tape.pos) {
+            printf("<%d> ", tape.values[index]);
+        } else {
+            printf("%d ", tape.values[index]);
+        }
     }
+    printf("...]\n");
+    printf("pos: %d", tape.pos);
 }
 
 void printProg(Program *prog) {
@@ -245,7 +252,7 @@ Program* progFromString(const char *str) {
                     // otherwise, go looking for a reasonable default value
                     val = defaultForInstruction(inst);
                 }
-                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+//                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }

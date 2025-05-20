@@ -11,60 +11,59 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-void instNOP(int val, Program *prog, Stack *stack) {
+#define TAPE_DELTA(val) ((TAPE_SIZE + tape->pos + val) % TAPE_SIZE)
+#define MOVE_TAPE(val) tape->pos = TAPE_DELTA(val)
+#define CURRENT_VALUE (tape->values[tape->pos])
+#define PREVIOUS_VALUE (tape->values[TAPE_DELTA(-1)])
+// implicitly subtracts
+#define PREVIOUS_VALUE_AT(val) (tape->values[TAPE_DELTA(-(val))])
+
+void instNOP(int val, Program *prog, Tape *tape) {
     // this space intentionally left blank
 }
 
-void instRED(int val, Program *prog, Stack *stack);
+void instRED(int val, Program *prog, Tape *tape);
 
 //TODO: so much more to implement here...
-void instDUP(int val, Program *prog, Stack *stack) {
-    // value is ignored for now, not sure exaclty how I want this to work
-    char dup = stack->values[stack->pos];
-    stack->pos++;
-    stack->values[stack->pos] = dup;
+void instDUP(int val, Program *prog, Tape *tape) {
+    tape->values[TAPE_DELTA(val)] = tape->values[tape->pos];;
 }
 
-void instINS(int val, Program *prog, Stack *stack) {
-    //TODO: this is super unsafe (can buffer overflow)
-    if (stack->pos >= PROG_SIZE) {
-        printf("!Stack overrun in INS.");
-        return;
-    }
-    stack->pos++;
-    stack->values[stack->pos] = val;
+void instINS(int val, Program *prog, Tape *tape) {
+    tape->values[tape->pos] = val;
+    MOVE_TAPE(1);
 }
 
 // this seems inefficient...
-void instOUT(int val, Program *prog, Stack *stack) {
+void instOUT(int val, Program *prog, Tape *tape) {
     bool oneVal   = ( val & 1 );
     bool decimal  = ( val & 2 );
 //    bool notImp   = ( val & 4 );
     bool reversed = ( val & 8 );
     
     if (oneVal) {
-        int pos = (reversed ? stack->pos : 0);
+        int pos = (reversed ? tape->pos : 0);
         
         if (decimal) {
-            printf("%d", stack->values[pos]);
+            printf("%d", tape->values[pos]);
         } else {
-            printf("%c", (char)stack->values[pos]);
+            printf("%c", (char)tape->values[pos]);
         }
     } else {
         if (reversed) {
-            for (int i=stack->pos; i>=0; i--) {
+            for (int i=tape->pos; i>=0; i--) {
                 if (decimal) {
-                    printf("%d ", stack->values[i]);
+                    printf("%d ", tape->values[i]);
                 } else {
-                    printf("%c", (char)stack->values[i]);
+                    printf("%c", (char)tape->values[i]);
                 }
             }
         } else {
-            for (int i=0; i<=stack->pos; i++) {
+            for (int i=0; i<=tape->pos; i++) {
                 if (decimal) {
-                    printf("%d ", stack->values[i]);
+                    printf("%d ", tape->values[i]);
                 } else {
-                    printf("%c", (char)stack->values[i]);
+                    printf("%c", (char)tape->values[i]);
                 }
             }
         }
@@ -74,48 +73,27 @@ void instOUT(int val, Program *prog, Stack *stack) {
     printf("\n");
 }
 
-void instSWP(int val, Program *prog, Stack *stack) {
+void instSWP(int val, Program *prog, Tape *tape) {
     // if we don't have enough values to make this work...
-    // just silently exit
-    if (stack->pos<val) { return; }
+    // just silently exit, making 0 a no-op
+    if (val==0) { return; }
     
-    if (val > 0) {
-        char swp = stack->values[stack->pos];
-        stack->values[stack->pos] = stack->values[stack->pos-val];
-        stack->values[stack->pos-val] = swp;
-    } else {
-        stack->values[stack->pos] = 0;
-        stack->pos--;
-    }
+    char swp = CURRENT_VALUE;
+    CURRENT_VALUE = PREVIOUS_VALUE_AT(val);
+    PREVIOUS_VALUE_AT(val) = swp;
 }
 
-void instAND(int val, Program *prog, Stack *stack) {
-    step(prog, stack, val);
+void instAND(int val, Program *prog, Tape *tape) {
+    step(prog, tape, val);
 }
 
-void instINC(int val, Program *prog, Stack *stack) {
-    // stack overrun implicitly inserts a value
-    if (stack->pos<0) {
-        stack->pos = 0;
-        stack->values[0] = 0;
-    }
-    stack->values[stack->pos] = stack->values[stack->pos] + val;
+void instINC(int val, Program *prog, Tape *tape) {
+    MOVE_TAPE(val);
 };
 
-void instANC(int val, Program *prog, Stack *stack) {
-//    printf("compare %d to %d", val, stack->values[stack->pos]);
-    
-    // value decides if we're looking at the top value of the stack or the amount of things *in* the stack
-    if (val>0) {
-        // asking for 1 value means stack position is at least 0
-        if (stack->pos<(val-1)) {
-            findEND(prog);
-        }
-    } else {
-        // stack index out of bounds ends loop
-        if (stack->pos < val || stack->values[stack->pos-val] <= 0) {
-            findEND(prog);
-        }
+void instANC(int val, Program *prog, Tape *tape) {
+    if (tape->pos<(val-1)) {
+        findEND(prog);
     }
 }
 
@@ -135,19 +113,11 @@ void findEND(Program *prog) {
     }
 }
 
-void instEND(int val, Program *prog, Stack *stack) {
-    // if stack is empty, there is nothing to do!
-    if (stack->pos<0 ) {
+void instEND(int val, Program *prog, Tape *tape) {
+    // if current tape is 0, there is nothing to do!
+    if (CURRENT_VALUE <= 0 ) {
         return;
-    }
-    
-    // default case, auto-decrement
-    if (val==0) {
-        // and then exit if stack value is 0 or less
-        if (stack->values[stack->pos] <= 0) {
-            return;
-        }
-    }
+    }    
     findANC(prog);
 }
 
@@ -170,106 +140,102 @@ void findANC(Program *prog) {
     prog->pos = prog->pos - 1;
 }
 
-void instMUL(int val, Program *prog, Stack *stack) {
-    if (stack->pos<val) {
-        // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 0 : 1);
-    }
+void instMUL(int val, Program *prog, Tape *tape) {
+    // not sure how this would happen, but we don't want it
+    if (val < 0) { return; }
     
     // save off relevant values
-    int first = stack->values[stack->pos];
-    int second = stack->values[stack->pos-val];
+    int first = CURRENT_VALUE;
+    int second = PREVIOUS_VALUE_AT(val);
     
-    if (val>0) {
-        // save result
-        stack->values[stack->pos-val] = second * first;
+    if (val > 0) {
+        for (int i=val; i>0; i--) {
+            PREVIOUS_VALUE_AT(i) = PREVIOUS_VALUE_AT(i-1);
+        }
         
-        // reduce stack
-        stack->values[stack->pos] = 0;
-        stack->pos--;
-    } else {
-        // if val points to top of stack, square it in place
-        stack->values[stack->pos] = first * first;
+        // clear the value where we started
+        CURRENT_VALUE = 0;
+        
+        // shift tape head
+        MOVE_TAPE(-1);
     }
+    // save result
+    CURRENT_VALUE = second * first;
 }
 
-void instADD(int val, Program *prog, Stack *stack) {
-    if (stack->pos<val) {
-        // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 0 : 1);
-    }
+void instADD(int val, Program *prog, Tape *tape) {
+    // not sure how this would happen, but we don't want it
+    if (val < 0) { return; }
     
     // save off relevant values
-    int first = stack->values[stack->pos];
-    int second = stack->values[stack->pos-val];
+    int first = CURRENT_VALUE;
+    int second = PREVIOUS_VALUE_AT(val);
     
-    if (val>0) {
-        // save result
-        stack->values[stack->pos-val] = second + first;
+    if (val > 0) {
+        for (int i=val; i>0; i--) {
+            PREVIOUS_VALUE_AT(i) = PREVIOUS_VALUE_AT(i-1);
+        }
         
-        // reduce stack
-        stack->values[stack->pos] = 0;
-        stack->pos--;
-    } else {
-        // if val points to top of stack, square it in place
-        stack->values[stack->pos] = first + first;
+        // clear the value where we started
+        CURRENT_VALUE = 0;
+        
+        // shift tape head
+        MOVE_TAPE(-1);
     }
+    // save result
+    CURRENT_VALUE = second + first;
 }
 
-void instDEC(int val, Program *prog, Stack *stack) {
-    // stack overrun implicitly inserts a value
-    if (stack->pos<0) {
-        stack->pos = 0;
-        stack->values[0] = 0;
-    }
-    stack->values[stack->pos] = stack->values[stack->pos] - val;
+void instDEC(int val, Program *prog, Tape *tape) {
+    MOVE_TAPE(-val);
 }
 
-void instSUB(int val, Program *prog, Stack *stack) {
-    if (stack->pos<val) {
-        // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 0 : 1);
-    }
+void instSUB(int val, Program *prog, Tape *tape) {
+    // not sure how this would happen, but we don't want it
+    if (val < 0) { return; }
     
     // save off relevant values
-    int first = stack->values[stack->pos];
-    int second = stack->values[stack->pos-val];
-
-    if (val>0) {
-        // save result
-        stack->values[stack->pos-val] = second - first;
+    int first = CURRENT_VALUE;
+    int second = PREVIOUS_VALUE_AT(val);
+    
+    if (val > 0) {
+        // shift numbers around on the tape
+        for (int i=val; i>0; i--) {
+            PREVIOUS_VALUE_AT(i) = PREVIOUS_VALUE_AT(i-1);
+        }
         
-        // reduce stack
-        stack->values[stack->pos] = 0;
-        stack->pos--;
-    } else {
-        // if val points to top of stack, square it in place
-        stack->values[stack->pos] = first - first;
+        // clear the value where we started
+        CURRENT_VALUE = 0;
+        
+        // shift tape head
+        MOVE_TAPE(-1);
     }
+    // save result
+    CURRENT_VALUE = second - first;
 }
 
-void instDAT(int val, Program *prog, Stack *stack);
+void instDAT(int val, Program *prog, Tape *tape);
 
-void instDIV(int val, Program *prog, Stack *stack) {
-    if (stack->pos<val) {
-        // for "safety" we reset to a simple case
-        val = (stack->pos<1 ? 0 : 1);
-    }
+void instDIV(int val, Program *prog, Tape *tape) {
+    // not sure how this would happen, but we don't want it
+    if (val < 0) { return; }
     
     // save off relevant values
-    int first = stack->values[stack->pos];
-    int second = stack->values[stack->pos-val];
+    int first = CURRENT_VALUE;
+    int second = PREVIOUS_VALUE_AT(val);
     
-    if (val>0) {
-        // save result
-        stack->values[stack->pos-val] = second / first;
+    if (val > 0) {
+        for (int i=val; i>0; i--) {
+            PREVIOUS_VALUE_AT(i) = PREVIOUS_VALUE_AT(i-1);
+        }
         
-        // reduce stack
-        stack->values[stack->pos] = 0;
-        stack->pos--;
-    } else {
-        // if val points to top of stack, square it in place
-        stack->values[stack->pos] = first / first;
+        // clear the value where we started
+        CURRENT_VALUE = 0;
+        
+        // shift tape head
+        MOVE_TAPE(-1);
     }
+    // save result
+    CURRENT_VALUE = second / first;
 }
 
