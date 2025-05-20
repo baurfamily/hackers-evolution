@@ -99,7 +99,7 @@ int defaultForInstruction(Instruction inst) {
         case NOP: return 0;
         case RED: return 1;
         case DUP: return 0;
-        case INS: return 0;
+        case INS: return 1;
         case OUT: return 0;
         case SWP: return 1;
         case AND: return 10; // no idea on this one
@@ -230,7 +230,14 @@ Program* progFromString(const char *str) {
                 Instruction inst = charToInstruction(str[i]);
                 int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
                 
-                if (errno == 0) {
+                
+                if (*endptr == '+' ) {
+                    // there is a weird edge case where you have an
+                    // addition operator directly after another instruction
+                    // the strtol is totally okay with just a unary '+'
+                    // but we don't consider that a number
+                    val = defaultForInstruction(inst);
+                } else if (errno == 0) {
                     // no error on conversion means we found a value
                     // no increment the parsing position
                     i++;
@@ -238,7 +245,7 @@ Program* progFromString(const char *str) {
                     // otherwise, go looking for a reasonable default value
                     val = defaultForInstruction(inst);
                 }
-//                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }
