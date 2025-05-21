@@ -46,8 +46,9 @@ int step(Program *prog, Tape *tape, int additionalVal) {
 }
 
 void executeWithTape(Program *prog, Tape *tape) {
-    printf("\nProgram execution!\n");
+    printf("\n");
     printProg(prog);
+    printf("\n");
     
     // init everything
     for (int i=0; i<PROG_SIZE; i++) {
@@ -64,11 +65,15 @@ void executeWithTape(Program *prog, Tape *tape) {
 }
 
 void execute(Program *prog) {
-    printf("\nProgram execution!\n");
-    printProg(prog);
-    
     Tape tape = { .values={}, .pos=0 };
     executeWithTape(prog, &tape);
+}
+
+Tape* tapeFromExecution(Program *prog) {
+    Tape *tape = newTape();
+    executeWithTape(prog, tape);
+    
+    return tape;
 }
 
 Instruction charToInstruction(const char c) {
@@ -97,7 +102,7 @@ int defaultForInstruction(Instruction inst) {
     switch (inst) {
         case NOP: return 0;
         case RED: return 1;
-        case DUP: return 0;
+        case DUP: return 1;
         case INS: return 1;
         case OUT: return 0;
         case SWP: return 1;
@@ -185,7 +190,6 @@ void printTape(Tape tape) {
         }
     }
     printf("...]\n");
-    printf("pos: %d", tape.pos);
 }
 
 void printProg(Program *prog) {
@@ -237,12 +241,12 @@ Program* progFromString(const char *str) {
                 Instruction inst = charToInstruction(str[i]);
                 int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
                 
-                
-                if (*endptr == '+' ) {
+                if (str[i+1] == '+') {
                     // there is a weird edge case where you have an
                     // addition operator directly after another instruction
                     // the strtol is totally okay with just a unary '+'
                     // but we don't consider that a number
+                    // even if it *is* a number, we don't want it parsed
                     val = defaultForInstruction(inst);
                 } else if (errno == 0) {
                     // no error on conversion means we found a value

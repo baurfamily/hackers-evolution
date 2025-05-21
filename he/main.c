@@ -45,7 +45,7 @@ void printUsage(void) {
     printf("Options:\n");
     printf("  -h, --help     Display this help message\n");
     printf("  -v, --version  Display version information\n");
-    printf("  -e,  --execute Execute program specified on the commandline.");
+    printf("  -e,  --execute Execute program specified on the commandline.\n");
     printf("  -i,  --interactive  Run a REPL you can interact with.\n\n");
 }
 
