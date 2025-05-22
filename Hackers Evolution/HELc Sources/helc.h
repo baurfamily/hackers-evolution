@@ -14,10 +14,12 @@
 #define PROG_SIZE 24
 #define TAPE_SIZE 24
 
+#define MAX_EXECUTION 1000
+
 typedef enum Instruction {
     NOP,    //   - skips this spot
     RED,    // ! - inserts <value> characters to the stack from STDIN or DATA
-    DUP,    // " - duplicates / copies - need to figure out symantics here - bitmask?
+    DUP,    // " - duplicates / copies - need to figure out symantics here
             //
     INS,    // # - inserts <value> to the stack, does not move the tape
     OUT,    // $ - outputs the stack as a (null-terminated) string (maybe use <value> for bitmask options?

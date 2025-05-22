@@ -16,7 +16,10 @@ Currently the parser removes all comemnts before executing the program, so they 
 
 Looping
 ```
-#A(0#1%1,1)0%0
+#A,(#1%1,1)0%0
+```
+```
+#A,("
 ```
 
 Leaves stack as:

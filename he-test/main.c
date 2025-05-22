@@ -12,6 +12,7 @@
 int main(int argc, const char * argv[]) {
     test_canParse();
     test_canDoMath();
+    test_canLoop();
 
     return 0;
 }

@@ -11,13 +11,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#define TAPE_DELTA(val) ((TAPE_SIZE + tape->pos + val) % TAPE_SIZE)
-#define MOVE_TAPE(val) tape->pos = TAPE_DELTA(val)
-#define CURRENT_VALUE (tape->values[tape->pos])
-#define PREVIOUS_VALUE (tape->values[TAPE_DELTA(-1)])
-// implicitly subtracts
-#define PREVIOUS_VALUE_AT(val) (tape->values[TAPE_DELTA(-(val))])
-
 void instNOP(int val, Program *prog, Tape *tape) {
     // this space intentionally left blank
 }
@@ -92,7 +85,7 @@ void instINC(int val, Program *prog, Tape *tape) {
 };
 
 void instANC(int val, Program *prog, Tape *tape) {
-    if (tape->pos<(val-1)) {
+    if (PREVIOUS_VALUE_AT(val) <= 0) {
         findEND(prog);
     }
 }
@@ -102,7 +95,7 @@ void findEND(Program *prog) {
     bool endFound = false;
     while (!endFound && prog->pos < PROG_SIZE) {
         prog->pos = prog->pos + 1;
-        switch (prog->code[prog->pos].inst) {
+        switch (CURRENT_PROG.inst) {
             case ANC:
                 anchorCount++;
             case END:
@@ -115,29 +108,34 @@ void findEND(Program *prog) {
 
 void instEND(int val, Program *prog, Tape *tape) {
     // if current tape is 0, there is nothing to do!
-    if (CURRENT_VALUE <= 0 ) {
+    if (PREVIOUS_VALUE_AT(val) <= 0 ) {
         return;
-    }    
+    }
     findANC(prog);
 }
 
+// weird stuff will happen if the () aren't matched
 void findANC(Program *prog) {
     int anchorCount = 1;
-    bool endFound = false;
     
-    while (!endFound && prog->pos >= 0) {
-        prog->pos = prog->pos - 1;
-        switch (prog->code[prog->pos].inst) {
+    for (int i=1; i<=PROG_SIZE; i++) {
+        MOVE_PROG(-1);
+        switch (CURRENT_PROG.inst) {
             case END:
                 anchorCount++;
+                break;
             case ANC:
                 anchorCount--;
-                if (anchorCount <= 0)
-                    endFound = true;
+                if (anchorCount <= 0) {
+                    // shift one more so the ANC executes next
+                    // weirdly, it's possible for the loop req.
+                    // to not match between ANC and END
+                    MOVE_PROG(-1);
+                    return;
+                }
+                break;
         }
     }
-    // decrement one more so the ANC executes next
-    prog->pos = prog->pos - 1;
 }
 
 void instMUL(int val, Program *prog, Tape *tape) {

@@ -15,10 +15,11 @@
 #include "instructions.h"
 
 int step(Program *prog, Tape *tape, int additionalVal) {
-    CodePoint code = prog->code[prog->pos];
+    CodePoint code = CURRENT_PROG;
     Instruction inst = code.inst;
     unsigned int val = code.val + (additionalVal << 4);
     
+    printf("%02d: %c%d => ", prog->pos, instructionToChar(code.inst), val);
     if (inst==0) return 0;
     
     switch (inst) {
@@ -40,7 +41,9 @@ int step(Program *prog, Tape *tape, int additionalVal) {
         case DIV: instDIV(val, prog, tape); break;
         default:  printf("unmatched instruction\n");
     }
-    prog->pos = prog->pos + 1;
+    MOVE_PROG(1);
+    
+    printTape(*tape);
     
     return inst;
 }
@@ -56,11 +59,9 @@ void executeWithTape(Program *prog, Tape *tape) {
         tape->pos = 0;
     }
     
-    for (int i=0; i<PROG_SIZE; i++) {
+    for (int i=0; i<MAX_EXECUTION; i++) {
         int returnCode = step(prog, tape, 0);
         if (returnCode==0) break;
-        
-        printTape(*tape);
     }
 }
 
@@ -184,9 +185,17 @@ void printTape(Tape tape) {
     for (int i=tape.pos-10; i<=tape.pos+10; i++) {
         int index = ((i > 0 ? i : TAPE_SIZE+i) % TAPE_SIZE);
         if (i==tape.pos) {
-            printf("<%d> ", tape.values[index]);
+            if (tape.values[index] == 0) {
+                printf("<.> ");
+            } else {
+                printf("<%d> ", tape.values[index]);
+            }
         } else {
-            printf("%d ", tape.values[index]);
+            if (tape.values[index] == 0) {
+                printf(". ");
+            } else {
+                printf("%d ", tape.values[index]);
+            }
         }
     }
     printf("...]\n");
@@ -241,7 +250,7 @@ Program* progFromString(const char *str) {
                 Instruction inst = charToInstruction(str[i]);
                 int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
                 
-                if (str[i+1] == '+') {
+                if (str[i+1] == '+' || str[i+1] == '-') {
                     // there is a weird edge case where you have an
                     // addition operator directly after another instruction
                     // the strtol is totally okay with just a unary '+'

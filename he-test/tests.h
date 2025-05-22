@@ -27,7 +27,9 @@
 #define RUN(text) tapeFromExecution(progFromString(text));
 #define ASSERT(test) if (test) { PASS; } else { FAIL; }; printf(#test);
 #define ASSERT_VALUE(val) if (tape->values[tape->pos] == val) { PASS; } else { FAIL; }; printf("%d == %d", tape->values[tape->pos], val);
+#define ASSERT_VALUE_AT(index,val) if (tape->values[(tape->pos+index)%TAPE_SIZE] == val) { PASS; } else { FAIL; }; printf("%d == %d", tape->values[(tape->pos+index)%TAPE_SIZE], val);
 
 
 void test_canParse(void);
+void test_canLoop(void);
 void test_canDoMath(void);

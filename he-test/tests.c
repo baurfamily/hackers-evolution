@@ -39,6 +39,57 @@ void test_canParse(void) {
     ASSERT(prog->code[1].val == 1);
 }
 
+void test_canLoop(void) {
+    Tape *tape;
+    
+    // rewind tape
+    tape = RUN("#2#1#1#1,(,)'");
+    ASSERT_VALUE(2);
+    
+    
+    tape = RUN("#4,('#1,3#1%-)'");
+    ASSERT_VALUE_AT(0,0);
+    ASSERT_VALUE_AT(1,1);
+    ASSERT_VALUE_AT(2,1);
+    ASSERT_VALUE_AT(3,1);
+    ASSERT_VALUE_AT(4,1);
+    ASSERT_VALUE_AT(5,0);
+    
+    // delete all values: (-0,)
+    tape = RUN("#1#1#1#1#1#1#1,(-0,)");
+    for (int i=0; i<PROG_SIZE; i++) {
+        ASSERT_VALUE_AT(i,0);
+    }
+    
+    // counting loop
+    // #5      <-- counting variable
+    // #1      <-- priming the loop
+    // (
+    //   (     <-- loop to move to end of tape
+    //     '
+    //   )
+    //   ,     <-- shift back one
+    //   "     <-- duplicate current value
+    //   (2    <-- loop to move back to beginning, but offset the check
+    //         <-- this makes it stop on the 1 that was primed
+    //     ,
+    //   )
+    //   -     <-- subtract the first one from the counting var
+    //   '     <-- shift forward one (into the empty space left from -
+    //   #1    <-- re-insert our prime value
+    // )2      <-- loop back!
+    // ,       <-- shift back to insert a marker (remember, loop was offset)
+    // #F
+    // ,
+    tape = RUN("#5#1(('),\"(2,)-'#1)2,#F,");
+    ASSERT_VALUE_AT(0,15);
+    ASSERT_VALUE_AT(1,1);
+    ASSERT_VALUE_AT(2,1);
+    ASSERT_VALUE_AT(3,1);
+    ASSERT_VALUE_AT(4,1);
+    ASSERT_VALUE_AT(5,1);
+}
+
 void test_canDoMath(void) {
     Tape *tape;
     
