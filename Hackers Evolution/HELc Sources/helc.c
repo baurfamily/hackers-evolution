@@ -19,8 +19,9 @@ int step(Program *prog, Tape *tape, int additionalVal) {
     Instruction inst = code.inst;
     unsigned int val = code.val + (additionalVal << 4);
     
-    printf("%02d: %c%d => ", prog->pos, instructionToChar(code.inst), val);
     if (inst==0) return 0;
+    
+    printf("%02d: %c%d => ", prog->pos, instructionToChar(code.inst), val);
     
     switch (inst) {
         case NOP: instNOP(val, prog, tape); break;

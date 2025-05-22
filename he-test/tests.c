@@ -46,7 +46,7 @@ void test_canLoop(void) {
     tape = RUN("#2#1#1#1,(,)'");
     ASSERT_VALUE(2);
     
-    
+    // one way to generate multiple numbers via a loop
     tape = RUN("#4,('#1,3#1%-)'");
     ASSERT_VALUE_AT(0,0);
     ASSERT_VALUE_AT(1,1);
@@ -78,7 +78,7 @@ void test_canLoop(void) {
     //   '     <-- shift forward one (into the empty space left from -
     //   #1    <-- re-insert our prime value
     // )2      <-- loop back!
-    // ,       <-- shift back to insert a marker (remember, loop was offset)
+    // ,       <-- shift back to insert a marker
     // #F
     // ,
     tape = RUN("#5#1(('),\"(2,)-'#1)2,#F,");

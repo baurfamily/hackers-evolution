@@ -15,6 +15,7 @@
 #define MOVE_TAPE(val) tape->pos = TAPE_DELTA(val)
 #define CURRENT_VALUE (tape->values[tape->pos])
 #define PREVIOUS_VALUE (tape->values[TAPE_DELTA(-1)])
+#define VALUE_AT(val) (tape->values[TAPE_DELTA(val)])
 // implicitly subtracts
 #define PREVIOUS_VALUE_AT(val) (tape->values[TAPE_DELTA(-(val))])
 

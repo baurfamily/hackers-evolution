@@ -96,7 +96,7 @@ void runRepl(void) {
 //            printf("]\n\n");
         }
         
-        printTape(*tape);
+//        printTape(*tape);
         printf("\n");
     }
     

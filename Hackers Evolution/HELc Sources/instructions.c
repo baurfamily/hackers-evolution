@@ -19,11 +19,18 @@ void instRED(int val, Program *prog, Tape *tape);
 
 //TODO: so much more to implement here...
 void instDUP(int val, Program *prog, Tape *tape) {
-    tape->values[TAPE_DELTA(val)] = tape->values[tape->pos];;
+    // special case for 0: duplicate *into* this spot from previous value
+    if (val == 0) {
+        CURRENT_VALUE = PREVIOUS_VALUE;
+    } else {
+        for (int i=1; i<=val; i++) {
+            VALUE_AT(i) = CURRENT_VALUE;
+        }
+    }
 }
 
 void instINS(int val, Program *prog, Tape *tape) {
-    tape->values[tape->pos] = val;
+    CURRENT_VALUE = val;
     MOVE_TAPE(1);
 }
 
@@ -67,21 +74,31 @@ void instOUT(int val, Program *prog, Tape *tape) {
 }
 
 void instSWP(int val, Program *prog, Tape *tape) {
-    // if we don't have enough values to make this work...
-    // just silently exit, making 0 a no-op
-    if (val==0) { return; }
-    
-    char swp = CURRENT_VALUE;
-    CURRENT_VALUE = PREVIOUS_VALUE_AT(val);
-    PREVIOUS_VALUE_AT(val) = swp;
+    // experiment with 0 swapping left-right values
+    // but leaving current tape position alone
+    if (val==0) {
+        char swp = PREVIOUS_VALUE_AT(1);
+        PREVIOUS_VALUE_AT(1) = PREVIOUS_VALUE_AT(-1);
+        PREVIOUS_VALUE_AT(-1) = swp;
+    } else {
+        char swp = CURRENT_VALUE;
+        CURRENT_VALUE = PREVIOUS_VALUE_AT(val);
+        PREVIOUS_VALUE_AT(val) = swp;
+    }
 }
 
 void instAND(int val, Program *prog, Tape *tape) {
+    MOVE_PROG(1);
     step(prog, tape, val);
 }
 
 void instINC(int val, Program *prog, Tape *tape) {
-    MOVE_TAPE(val);
+    // experiment with special meaning for 0
+    if (val == 0) {
+        CURRENT_VALUE++;
+    } else {
+        MOVE_TAPE(val);
+    }
 };
 
 void instANC(int val, Program *prog, Tape *tape) {
@@ -185,7 +202,11 @@ void instADD(int val, Program *prog, Tape *tape) {
 }
 
 void instDEC(int val, Program *prog, Tape *tape) {
-    MOVE_TAPE(-val);
+    if (val == 0) {
+        CURRENT_VALUE--;
+    } else {
+        MOVE_TAPE(-val);
+    }
 }
 
 void instSUB(int val, Program *prog, Tape *tape) {
