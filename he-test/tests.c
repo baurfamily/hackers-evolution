@@ -143,3 +143,43 @@ void test_canDoMath(void) {
     
 }
 
+void test_tapeManipulation_moving(void) {
+    Tape *tape;
+    
+    //setup
+    tape = RUN("#1#2#3#4#5#6#7#8#9");
+    
+    RUN_MORE(",");
+    ASSERT_VALUE(9);
+    
+    RUN_MORE(",2");
+    ASSERT_VALUE(7);
+    
+    RUN_MORE(",3");
+    ASSERT_VALUE(4);
+    
+    RUN_MORE(",0");
+    ASSERT_VALUE(3);
+    ASSERT_VALUE_AT(-1, 3);
+    
+    RUN_MORE("'");
+    ASSERT_VALUE(5);
+    
+    RUN_MORE("'2");
+    ASSERT_VALUE(7);
+    
+    RUN_MORE("'3");
+    ASSERT_VALUE(0);
+    
+    RUN_MORE("'0'0");
+    ASSERT_VALUE(2);
+}
+
+void test_tapeManipulation_swap(void) {
+    Tape *tape;
+    
+    //setup
+    tape = RUN("#1#2#3#4#5#6#7#8#9");
+    
+    RUN_MORE("");
+}

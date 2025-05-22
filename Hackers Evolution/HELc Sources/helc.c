@@ -54,12 +54,6 @@ void executeWithTape(Program *prog, Tape *tape) {
     printProg(prog);
     printf("\n");
     
-    // init everything
-    for (int i=0; i<PROG_SIZE; i++) {
-        tape->values[i] = 0;
-        tape->pos = 0;
-    }
-    
     for (int i=0; i<MAX_EXECUTION; i++) {
         int returnCode = step(prog, tape, 0);
         if (returnCode==0) break;
@@ -71,8 +65,10 @@ void execute(Program *prog) {
     executeWithTape(prog, &tape);
 }
 
-Tape* tapeFromExecution(Program *prog) {
-    Tape *tape = newTape();
+Tape* tapeFromExecution(Program *prog, Tape *tape) {
+    if (tape == NULL) {
+        tape = newTape();
+    }
     executeWithTape(prog, tape);
     
     return tape;

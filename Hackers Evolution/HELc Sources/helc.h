@@ -69,7 +69,7 @@ int defaultForInstruction(Instruction inst);
 int step(Program *prog, Tape *tape, int additionalValue);
 void executeWithTape(Program *prog, Tape *tape);
 void execute(Program *prog);
-Tape* tapeFromExecution(Program *prog);
+Tape* tapeFromExecution(Program *prog, Tape *tape);
 void printTape(Tape tape);
 void printProg(Program *program);
 
