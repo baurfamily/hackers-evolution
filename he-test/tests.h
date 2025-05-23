@@ -34,5 +34,5 @@
 void test_canParse(void);
 void test_canLoop(void);
 void test_canDoMath(void);
-void test_tapeManipulation(void);
+void test_tapeManipulation_moving(void);
 void test_tapeManipulation_swap(void);

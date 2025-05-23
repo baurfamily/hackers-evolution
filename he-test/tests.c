@@ -181,5 +181,20 @@ void test_tapeManipulation_swap(void) {
     //setup
     tape = RUN("#1#2#3#4#5#6#7#8#9");
     
-    RUN_MORE("");
+    RUN_MORE(",5%");
+    ASSERT_VALUE_AT(-1, 5);
+    ASSERT_VALUE_AT(0, 4);
+    ASSERT_VALUE_AT(1, 6);
+    
+    RUN_MORE("%0");
+    ASSERT_VALUE_AT(-1, 6);
+    ASSERT_VALUE_AT(0, 4);
+    ASSERT_VALUE_AT(1, 5);
+    
+    RUN_MORE("%3");
+    ASSERT_VALUE_AT(-3, 4);
+    ASSERT_VALUE_AT(-2, 3);
+    ASSERT_VALUE_AT(-1, 6);
+    ASSERT_VALUE_AT(0, 2);
+    ASSERT_VALUE_AT(1, 5);
 }

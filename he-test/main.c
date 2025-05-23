@@ -13,7 +13,8 @@ int main(int argc, const char * argv[]) {
     test_canParse();
     test_canDoMath();
     test_canLoop();
-    test_tapeManipulation();
+    test_tapeManipulation_moving();
+    test_tapeManipulation_swap();
 
     return 0;
 }
