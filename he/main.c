@@ -19,6 +19,9 @@
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
 
+/* Flag set by '--quiet' */
+static int quiet_flag;
+
 /* Flag set by ‘--byte-encoded’. */
 static int byte_encoded;
 
@@ -36,6 +39,7 @@ int main(int argc, const char *argv[]) {
             /* These options set a flag. */
             {"verbose",     no_argument,       &verbose_flag, 1},
             {"byte-encoded",no_argument,       &byte_encoded, 'b'},
+            {"quiet",       no_argument,       &quiet_flag, 'q'},
             /* These options don’t set a flag.
              We distinguish them by their indices. */
             {"version",     no_argument,       0, 'v'},
@@ -48,7 +52,7 @@ int main(int argc, const char *argv[]) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
         
-        c = getopt_long (argc, argv, "vbire:",
+        c = getopt_long (argc, argv, "vbirqe:",
                          long_options, &option_index);
         
         /* Detect the end of the options. */
@@ -82,7 +86,8 @@ int main(int argc, const char *argv[]) {
                 break;
                 
             case 'e':
-                printf("Given prog: %s", optarg);
+                if (isVerbose()) printf("Given prog: %s", optarg);
+                
                 if (byte_encoded) {
                     prog = progFromBytes(optarg);
                 } else {
@@ -127,6 +132,7 @@ int main(int argc, const char *argv[]) {
     }
     free(prog);
     
+    printf("\n");
     exit (0);
 }
 
@@ -141,8 +147,16 @@ const char *generateBytes(size_t num_bytes) {
   return stream;
 }
 
+bool isVerbose(void) {
+    return verbose_flag;
+}
+
+bool isQuiet(void) {
+    return quiet_flag;
+}
+
 void runRepl(Program *prog, Tape *tape) {
-    printf("helc version 0.0.1\n");
+    printf("\nhelc version 0.0.1\n");
     printf("-- Interactive mode --\n");
     
     char input[MAX_INPUT_SIZE];
@@ -191,7 +205,7 @@ void runRepl(Program *prog, Tape *tape) {
         while (returnCode) {
             returnCode = step(prog, tape, 0);
         }
-        printProg(prog);
+        if (isVerbose()) printProg(prog);
         
 //        printTape(*tape);
         printf("\n");

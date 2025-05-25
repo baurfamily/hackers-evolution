@@ -74,6 +74,51 @@ To clear the entire stack, you can use the stack-based loop, which continues as 
 
 ## Hello, world
 
+### The easy way
+
+Using the data and read instructions:
+
+```
+.DHello, world.!D(1,)$
+```
+
+This can be run on the command line with:
+```
+he --execute=".DHello, world.!D(1,)$0"
+```
+
+Let's break this down into four main steps.
+
+#### Insert data
+
+The `.D` instruction causes the program to interpret the next 13 bytes as ASCII characters (`D` is 13 in hexidecimal). These are inserted into the program but skipped over stepping through instructions.
+
+#### Read data into the tape
+
+The `!D` instruction says to read 12 (D in hex) characters after the first data instruction and insert the ASCII value into the tape. After each insertion, the tape pointer is moved 1, so after all the insertions the pointer will be just after the last element, pointing to an empty tape slot.
+
+#### Rewind loop
+
+The next few instruction cause the tape pointer to rewind. `(1` starts the loop by looking at the tape value just before the current one, which currently contains the last ASCII value (for the "." at the end). As long as the value inspected is non-zero, the loop will continue - otherwise it will jump to just after the closing `)`
+
+The `,` simply moves the tape pointer back one slot. 
+
+Instead of using a loop, since we know the number of characters, we could have been specific and told it to back 12 spaces without the loop with just `,D`
+
+#### Output string
+
+Finally, the `$` tells the program to output a string from the ASCII values stored in the tape, starting from the current value up to the first empty slot (ie: storing 0). (If there was a non-zero number after the `$`  it would have only outputted that count of characters).
+
+### A word about defaults
+
+There are a couple places in which we do not have a number after the instruction. In these cases, a reasonable default is assumed, which may be different depending on the instruction.
+
+For `,` the default is 1. For `$` the default is 0 (ie: read all). For `(` the normal default is 0, but we overrode that to 1 to not have to move the pointer before starting. Instead of `(1,)` we could have just as easily done `,(,)` for the same result.
+
+
+## Another Hello, world
+
+
 The ASCII values need to print "Hello, world" are listed below. Decimal and hexidecimal.
 ```
  H   e   l   l   o   ,       w   o   r   l   d 

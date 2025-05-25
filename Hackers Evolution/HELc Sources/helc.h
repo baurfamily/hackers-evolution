@@ -11,8 +11,8 @@
 #ifndef HELC_H
 #define HELC_H
 
-#define PROG_SIZE 24
-#define TAPE_SIZE 24
+#define PROG_SIZE 128
+#define TAPE_SIZE 128
 
 #define MAX_EXECUTION 10000
 

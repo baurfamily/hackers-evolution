@@ -28,7 +28,7 @@ void instRED(int val, Program *prog, Tape *tape) {
         CURRENT_VALUE = (cp.inst << 4) | cp.val;
         MOVE_TAPE(1);
     }
-    prog->dataPos = end;
+    prog->dataPos = end % PROG_SIZE;
 }
 
 void findDAT(Program *prog) {
@@ -62,41 +62,13 @@ void instINS(int val, Program *prog, Tape *tape) {
 
 // this seems inefficient...
 void instOUT(int val, Program *prog, Tape *tape) {
-    bool oneVal   = ( val & 1 );
-    bool decimal  = ( val & 2 );
-//    bool notImp   = ( val & 4 );
-    bool reversed = ( val & 8 );
+    int end = val == 0 ? PROG_SIZE : val;
     
-    if (oneVal) {
-        int pos = (reversed ? tape->pos : 0);
-        
-        if (decimal) {
-            printf("%d", tape->values[pos]);
-        } else {
-            printf("%c", (char)tape->values[pos]);
-        }
-    } else {
-        if (reversed) {
-            for (int i=tape->pos; i>=0; i--) {
-                if (decimal) {
-                    printf("%d ", tape->values[i]);
-                } else {
-                    printf("%c", (char)tape->values[i]);
-                }
-            }
-        } else {
-            for (int i=0; i<=tape->pos; i++) {
-                if (decimal) {
-                    printf("%d ", tape->values[i]);
-                } else {
-                    printf("%c", (char)tape->values[i]);
-                }
-            }
-        }
+    for (int i=0; i<end; i++) {
+        if (CURRENT_VALUE == 0) break;
+        printf("%c", CURRENT_VALUE);
+        MOVE_TAPE(1);
     }
-    
-    // not sure if I really want this
-    printf("\n");
 }
 
 void instSWP(int val, Program *prog, Tape *tape) {
