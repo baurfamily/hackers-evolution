@@ -15,7 +15,32 @@ void instNOP(int val, Program *prog, Tape *tape) {
     // this space intentionally left blank
 }
 
-void instRED(int val, Program *prog, Tape *tape);
+void instRED(int val, Program *prog, Tape *tape) {
+    findDAT(prog);
+    
+    int start = prog->dataPos;
+    int end = prog->dataPos + val;
+    
+    for (int i=start; i<end; i++) {
+        CodePoint cp = prog->code[i];
+        // reconstruct the original value from the broken up bits
+        // might be able to do a simple cast of the struct
+        CURRENT_VALUE = (cp.inst << 4) | cp.val;
+        MOVE_TAPE(1);
+    }
+}
+
+void findDAT(Program *prog) {
+    for (int i=prog->dataPos; i<PROG_SIZE; i++) {
+        if (prog->code[i].inst == DAT) {
+            prog->dataPos += i + 1;
+            return;
+        }
+    }
+    // okay, not sure this makes sense, but if we don't find a DAT mark
+    // we'll just keep reading from where we left off (which might have
+    // been the start of the program if there are no DAT instructions
+}
 
 //TODO: so much more to implement here...
 void instDUP(int val, Program *prog, Tape *tape) {
@@ -110,8 +135,8 @@ void instANC(int val, Program *prog, Tape *tape) {
 void findEND(Program *prog) {
     int anchorCount = 1;
     bool endFound = false;
-    while (!endFound && prog->pos < PROG_SIZE) {
-        prog->pos = prog->pos + 1;
+    while (!endFound && prog->pos < PROG_SIZE-1) {
+        MOVE_PROG(1);
         switch (CURRENT_PROG.inst) {
             case ANC:
                 anchorCount++;
@@ -233,7 +258,13 @@ void instSUB(int val, Program *prog, Tape *tape) {
     CURRENT_VALUE = second - first;
 }
 
-void instDAT(int val, Program *prog, Tape *tape);
+void instDAT(int val, Program *prog, Tape *tape)  {
+    // this marks data, the <value> is the number of
+    // prog steps that are considered data
+    // this is NOT validated on read, only used to skip
+    // what we *assume* are not valid program instructions
+    MOVE_PROG(val);
+}
 
 void instDIV(int val, Program *prog, Tape *tape) {
     // not sure how this would happen, but we don't want it

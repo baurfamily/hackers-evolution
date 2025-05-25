@@ -12,7 +12,7 @@
 #define RESET printf("\033[0m");
 
 #define BLACK printf("\n\033[0;30m");
-#define RED printf("\n\033[0;31m");
+#define REDD printf("\n\033[0;31m");
 #define GREEN printf("\n\033[0;32m");
 #define YELLOW printf("\n\033[0;33m");
 #define BLUE printf("\n\033[0;34m");
@@ -21,7 +21,7 @@
 #define WHITE printf("\n\033[0;37m");
 
 #define PASS GREEN printf(" pass "); RESET
-#define FAIL RED printf(" fail "); RESET
+#define FAIL REDD printf(" fail "); RESET
 
 #define PARSE(text) progFromString(text);
 #define RUN(text) tapeFromExecution(progFromString(text), NULL);
@@ -36,3 +36,4 @@ void test_canLoop(void);
 void test_canDoMath(void);
 void test_tapeManipulation_moving(void);
 void test_tapeManipulation_swap(void);
+void test_readingData(void);

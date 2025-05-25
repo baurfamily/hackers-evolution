@@ -8,55 +8,143 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
+#include <stdbool.h>
+#include <time.h>
 
 #include "main.h"
 
 #define MAX_INPUT_SIZE 1024
 
-int main(int argc, const char * argv[]) {
-    // Example: Processing a specific argument
-    if (argc > 1) {
-        if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0) {
-            printUsage();
-        } else if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0) {
-            printf("Program Version 0.0.1\n");
-        } else if (strcmp(argv[1], "-e") == 0 || strcmp(argv[1], "--execute") == 0) {
-            if (argc < 2) {
-                printf("Not enough arguments for execute, please provide the code to execute after option.");
-                return 1;
-            }
-            Program *prog = progFromString(argv[2]);
-            execute(prog);
-            free(prog);
-        } else if (strcmp(argv[1], "-i") == 0 || strcmp(argv[1], "--interactive") == 0) {
-            runRepl();
-        } else {
-            printUsage();
+/* Flag set by ‘--verbose’. */
+static int verbose_flag;
+
+/* Flag set by ‘--byte-encoded’. */
+static int byte_encoded;
+
+int main(int argc, const char *argv[]) {
+    srand((unsigned int)time(NULL));
+    int c;
+    int numBytes;
+    bool repl = false;
+    Program *prog = NULL;
+    
+    while (1)
+    {
+        static struct option long_options[] =
+        {
+            /* These options set a flag. */
+            {"verbose",     no_argument,       &verbose_flag, 1},
+            {"byte-encoded",no_argument,       &byte_encoded, 'b'},
+            /* These options don’t set a flag.
+             We distinguish them by their indices. */
+            {"version",     no_argument,       0, 'v'},
+            {"interactive", no_argument,       0, 'i'},
+            {"random",      required_argument, 0, 'r'},
+            {"execute",     required_argument, 0, 'e'},
+//            {"file",        required_argument, 0, 'f'},
+            {0, 0, 0, 0}
+        };
+        /* getopt_long stores the option index here. */
+        int option_index = 0;
+        
+        c = getopt_long (argc, argv, "vbire:",
+                         long_options, &option_index);
+        
+        /* Detect the end of the options. */
+        if (c == -1)
+            break;
+        
+        switch (c)
+        {
+            case 0:
+                /* If this option set a flag, do nothing else now. */
+                if (long_options[option_index].flag != 0)
+                    break;
+                printf ("option %s", long_options[option_index].name);
+                if (optarg)
+                    printf (" with arg %s", optarg);
+                printf ("\n");
+                break;
+                
+            case 'i':
+                repl = true;
+                break;
+                
+            case 'r':
+                numBytes = (unsigned int)strtol(optarg, NULL, 16);
+                prog = progFromBytes(generateBytes(numBytes));
+                break;
+                
+            case 'e':
+                printf("Given prog: %s", optarg);
+                if (byte_encoded) {
+                    prog = progFromBytes(optarg);
+                } else {
+                    prog = progFromString(optarg);
+                }
+                break;
+                
+                // file option not supported yet
+//            case 'f':
+//                printf ("option -f with value `%s'\n", optarg);
+//                break;
+//                
+            case '?':
+                /* getopt_long already printed an error message. */
+                break;
+                
+            default:
+                abort ();
         }
-    } else {
-        printUsage();
     }
     
-    return 0;
+    if (verbose_flag)
+        puts ("verbose flag is set");
+    
+    /* Print any remaining command line arguments (not options). */
+    if (optind < argc)
+    {
+        printf ("non-option ARGV-elements: ");
+        while (optind < argc)
+            printf ("%s ", argv[optind++]);
+        putchar ('\n');
+    }
+    
+    if (prog != NULL) {
+        Tape *tape = tapeFromExecution(prog, NULL);
+        free(prog);
+        if (repl) {
+            runRepl(tape);
+        }
+    } else if (repl) {
+        runRepl(NULL);
+    }
+    
+    exit (0);
 }
 
-void printUsage(void) {
-    printf("Usage: program_name [options] [arguments]\n");
-    printf("Options:\n");
-    printf("  -h, --help     Display this help message\n");
-    printf("  -v, --version  Display version information\n");
-    printf("  -e,  --execute Execute program specified on the commandline.\n");
-    printf("  -i,  --interactive  Run a REPL you can interact with.\n\n");
+const char *generateBytes(size_t num_bytes) {
+  unsigned char *stream = malloc (num_bytes);
+  size_t i;
+
+  for (i = 0; i < num_bytes; i++) {
+    stream[i] = rand ();
+  }
+
+  return stream;
 }
 
-void runRepl(void) {
+void runRepl(Tape *tape) {
     printf("helc version 0.0.1\n");
     printf("-- Interactive mode --\n");
     
     char input[MAX_INPUT_SIZE];
 
     Program *prog = newProg();
-    Tape *tape = newTape();
+    if (tape == NULL) {
+        tape = newTape();
+    }
     
     while (1) {
         printf("> ");

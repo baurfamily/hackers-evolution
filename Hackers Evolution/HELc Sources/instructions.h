@@ -8,7 +8,8 @@
 #ifndef INSTRUCTIONS_H
 #define INSTRUCTIONS_H
 
-#define MOVE_PROG(val) prog->pos = ((PROG_SIZE + prog->pos + val) % PROG_SIZE)
+#define MOVE_PROG(val) prog->pos = PROG_DELTA(val);
+#define PROG_DELTA(val) ((PROG_SIZE + prog->pos + val) % PROG_SIZE)
 #define CURRENT_PROG (prog->code[prog->pos])
 
 #define TAPE_DELTA(val) ((TAPE_SIZE + tape->pos + val) % TAPE_SIZE)
@@ -22,6 +23,7 @@
 
 void instNOP(int val, Program *prog, Tape *tape);
 void instRED(int val, Program *prog, Tape *tape);
+void findDAT(Program *prog);
 void instDUP(int val, Program *prog, Tape *tape);
 void instINS(int val, Program *prog, Tape *tape);
 void instOUT(int val, Program *prog, Tape *tape);

@@ -12,10 +12,11 @@
 void test_canParse(void) {
     Program *prog;
     
-    // fully qualified
-    prog = PARSE(" !\"#$%&'()*+,-./");
+    // using implict values
+    // note the extra value after the dot
+    prog = PARSE(" !\"#$%&'()*+,-.X/");
     ASSERT(prog->code[0].inst == NOP); ASSERT(prog->code[0].val == 0);
-    //ASSERT(prog->code[1].inst == RED); //conflicts with color define
+    ASSERT(prog->code[1].inst == RED); ASSERT(prog->code[1].val == 1);
     ASSERT(prog->code[2].inst == DUP); ASSERT(prog->code[2].val == 1);
     ASSERT(prog->code[3].inst == INS); ASSERT(prog->code[3].val == 1);
     ASSERT(prog->code[4].inst == OUT); ASSERT(prog->code[4].val == 0);
@@ -29,7 +30,9 @@ void test_canParse(void) {
     ASSERT(prog->code[12].inst == DEC); ASSERT(prog->code[12].val == 1);
     ASSERT(prog->code[13].inst == SUB); ASSERT(prog->code[13].val == 1);
     ASSERT(prog->code[14].inst == DAT); ASSERT(prog->code[14].val == 1);
-    ASSERT(prog->code[15].inst == DIV); ASSERT(prog->code[15].val == 1);
+    // this is the "X" ASCII value, interpreted as a CodePoint
+    ASSERT(prog->code[15].inst == SWP); ASSERT(prog->code[15].val == 8);
+    ASSERT(prog->code[16].inst == DIV); ASSERT(prog->code[16].val == 1);
     
     prog = PARSE("#1+1+1");
     
@@ -197,4 +200,18 @@ void test_tapeManipulation_swap(void) {
     ASSERT_VALUE_AT(-1, 6);
     ASSERT_VALUE_AT(0, 2);
     ASSERT_VALUE_AT(1, 5);
+}
+
+void test_readingData(void) {
+    Tape *tape;
+    
+    // nothing read, noting in tape
+    tape = RUN(".5ABCDE!0");
+    ASSERT(tape->pos == 0);
+    ASSERT_VALUE(0);
+    
+    // read two values
+    tape = RUN(".5ABCDE!2");
+    ASSERT_VALUE_AT(-2, 65);
+    ASSERT_VALUE_AT(-1, 66);
 }

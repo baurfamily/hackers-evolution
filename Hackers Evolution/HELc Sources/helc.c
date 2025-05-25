@@ -15,17 +15,18 @@
 #include "instructions.h"
 
 int step(Program *prog, Tape *tape, int additionalVal) {
+
     CodePoint code = CURRENT_PROG;
     Instruction inst = code.inst;
     unsigned int val = code.val + (additionalVal << 4);
     
     if (inst==0) return 0;
     
-    printf("%02d: %c%d => ", prog->pos, instructionToChar(code.inst), val);
+    printf("%02d: %c%02d => ", prog->pos, instructionToChar(code.inst), val);
     
     switch (inst) {
         case NOP: instNOP(val, prog, tape); break;
-//            case RED: return '!';
+        case RED: instRED(val, prog, tape); break;;
         case DUP: instDUP(val, prog, tape); break;
         case INS: instINS(val, prog, tape); break;
         case OUT: instOUT(val, prog, tape); break;
@@ -38,7 +39,7 @@ int step(Program *prog, Tape *tape, int additionalVal) {
         case ADD: instADD(val, prog, tape); break;
         case DEC: instDEC(val, prog, tape); break;
         case SUB: instSUB(val, prog, tape); break;
-//            case DAT: return '.';
+        case DAT: instDAT(val, prog, tape); break;;
         case DIV: instDIV(val, prog, tape); break;
         default:  printf("unmatched instruction\n");
     }
@@ -46,6 +47,9 @@ int step(Program *prog, Tape *tape, int additionalVal) {
     
     printTape(*tape);
     
+    if (prog->pos == 0) {
+        return -1;
+    }
     return inst;
 }
 
@@ -56,7 +60,7 @@ void executeWithTape(Program *prog, Tape *tape) {
     
     for (int i=0; i<MAX_EXECUTION; i++) {
         int returnCode = step(prog, tape, 0);
-        if (returnCode==0) break;
+        if (returnCode==-1) break;
     }
 }
 
@@ -221,6 +225,14 @@ void printProg(Program *prog) {
     }
 }
 
+// this may not be a "readable" character
+// this one is for the encoded version
+CodePoint codePointFromEncodedChar(const char c) {
+    int inst = c >> 4;
+    int val = c & 15;
+    return (CodePoint) { .inst = inst, .val = val };
+}
+
 CodePoint codePointFromString(const char *str) {
     return (CodePoint) {
         .inst = charToInstruction(str[0]),
@@ -228,10 +240,30 @@ CodePoint codePointFromString(const char *str) {
     };
 }
 
+Program* progFromBytes(const char *str) {
+    Program *prog = newProg();
+    
+    unsigned long length = strlen(str);
+
+    int i;
+    for (i=0; i<length; i++) {
+        CodePoint cp = codePointFromEncodedChar(str[i]);
+        prog->code[i] = cp;
+        printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
+        
+    }
+    i++;
+    prog->code[i] = (CodePoint){ .inst=0, .val=0 };
+    
+    return prog;
+}
+
 Program* progFromString(const char *str) {
     Program *prog = newProg();
     
     unsigned long length = strlen(str);
+    
+    int skipData = 0;
 
     int j=0;
     bool comment = false;
@@ -242,10 +274,19 @@ Program* progFromString(const char *str) {
             comment = false;
         } else {
             if (!comment) {
-                char *endptr;
+                if (skipData > 0) {
+                    CodePoint cp = codePointFromEncodedChar(str[i]);
+                    prog->code[j] = cp;
+                    j++;
+                    skipData--;
+                    
+                    printf("(%d, %d): dat: %c/%d => %d\n", i, j, instructionToChar(cp.inst), cp.val, (cp.inst << 4) | cp.val);
+                    continue;
+                }
                 errno = 0;
                 Instruction inst = charToInstruction(str[i]);
-                int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
+                const char maybeVal[2] = { str[i+1] };
+                int val = (unsigned int)strtol(maybeVal, NULL, 16);
                 
                 if (str[i+1] == '+' || str[i+1] == '-') {
                     // there is a weird edge case where you have an
@@ -262,7 +303,11 @@ Program* progFromString(const char *str) {
                     // otherwise, go looking for a reasonable default value
                     val = defaultForInstruction(inst);
                 }
-//                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+
+                if (inst == DAT) {
+                    skipData = val;
+                }
+                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }

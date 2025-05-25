@@ -49,6 +49,7 @@ typedef struct CodePoint {
 
 typedef struct Program {
     int pos;
+    int dataPos;
     CodePoint code[PROG_SIZE];
 } Program;
 
@@ -76,7 +77,9 @@ void printProg(Program *program);
 Program* newProg(void);
 Tape* newTape(void);
 Instance* newInstance(void);
+CodePoint codePointFromEncodedChar(const char str);
 CodePoint codePointFromString(const char *str);
+Program* progFromBytes(const char *str);
 Program* progFromString(const char *str);
 
 #endif

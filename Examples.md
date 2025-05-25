@@ -101,22 +101,22 @@ These values are too big to enter directly. Since we're trying a differnt method
 ... etc. Spaces added for convienience. If we can get to the value more directly, that style is shown.
 
 ```
-#4#A*1
-#9#6#A*1+1
-#6#7#A*1+1
-#6#7#A*1+1
-#9#7#A*1+1
-#C
+#4#A,*1'
+#9#6#A,*1+1'
+#6#7#A,*1+1'
+#6#7#A,*1+1'
+#9#7#A,*1+1'
+#C'
 #0
-#7#8#A*1+1
+#7#8#A,*1+1'
 #B
-#9#7#A*1+1
-#2#8#A*1+1
-#6#7#A*1+1
-#8#6#A*1+1
+#9#7#A,*1+1'
+#2#8#A,*1+1'
+#6#7#A,*1+1'
+#8#6#A,*1+1'
 ```
 
-Conviniently, 32 is 16 doubled, so just to be different we'll insert 15, double it (add to itself) and add 2: `#F+0'2`.
+Conviniently, 32 is 16 doubled, so just to be different we'll insert 15, double it (add to itself) and add 2: `#F+0'#2,+`.
 
 But we need to do this to each value in the existing stack, which will require a loop. Within the loop, we can DUP the value, we don't need to re-calculate it every time.
 
