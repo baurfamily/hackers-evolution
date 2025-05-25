@@ -113,13 +113,14 @@ int main(int argc, const char *argv[]) {
     
     if (prog != NULL) {
         Tape *tape = tapeFromExecution(prog, NULL);
-        free(prog);
+        
         if (repl) {
-            runRepl(tape);
+            runRepl(prog, tape);
         }
     } else if (repl) {
-        runRepl(NULL);
+        runRepl(prog, NULL);
     }
+    free(prog);
     
     exit (0);
 }
@@ -135,13 +136,15 @@ const char *generateBytes(size_t num_bytes) {
   return stream;
 }
 
-void runRepl(Tape *tape) {
+void runRepl(Program *prog, Tape *tape) {
     printf("helc version 0.0.1\n");
     printf("-- Interactive mode --\n");
     
     char input[MAX_INPUT_SIZE];
 
-    Program *prog = newProg();
+    if (prog == NULL) {
+        prog = newProg();
+    }
     if (tape == NULL) {
         tape = newTape();
     }
@@ -171,18 +174,19 @@ void runRepl(Tape *tape) {
         // value specified, use 1 - it's a common enough default
         if (strlen(input) == 1) { inputProg->code[0].val = 1; }
         
+        for (int i=0; i<PROG_SIZE; i++) {
+            CodePoint cp = inputProg->code[i];
+            if (cp.inst != NOP) {
+                prog->code[prog->pos+i] = cp;
+                printf("wrote instruction: %d => ( %c, %d )", prog->pos, instructionToChar(cp.inst), cp.val);
+            }
+        }
+        
         int returnCode = -1;
         while (returnCode) {
-            prog->code[prog->pos] = inputProg->code[inputProg->pos];
-            prog->pos = prog->pos + 1;
-            returnCode = step(inputProg, tape, 0);
-            // #A(0#1%1,1)0#2
-            
-            // step-wise stack printing...
-//            printf("%d => [ ", returnCode);
-//            printStack(*stack);
-//            printf("]\n\n");
+            returnCode = step(prog, tape, 0);
         }
+        printProg(prog);
         
 //        printTape(*tape);
         printf("\n");

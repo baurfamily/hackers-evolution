@@ -8,5 +8,5 @@
 #include "helc.h"
 
 const char *generateBytes(size_t num_bytes);
-void runRepl(Tape *tape);
+void runRepl(Program *prog, Tape *tape);
 void printUsage(void);

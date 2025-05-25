@@ -28,6 +28,7 @@ void instRED(int val, Program *prog, Tape *tape) {
         CURRENT_VALUE = (cp.inst << 4) | cp.val;
         MOVE_TAPE(1);
     }
+    prog->dataPos = end;
 }
 
 void findDAT(Program *prog) {
