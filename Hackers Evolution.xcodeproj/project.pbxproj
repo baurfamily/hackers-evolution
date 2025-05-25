@@ -43,6 +43,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		3F493C612DDD587E0096BC53 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -54,6 +63,7 @@
 		3F0CE8B22DBE1CB500C20C7E /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		3F0CE8C42DC344E800C20C7E /* Language.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Language.md; sourceTree = "<group>"; };
 		3F493C4A2DD45F3F0096BC53 /* he */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = he; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F493C632DDD587E0096BC53 /* he-test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "he-test"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FD3C85D2DC9DEAB00695A3F /* Examples.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Examples.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -66,6 +76,28 @@
 			);
 			target = 3F493C492DD45F3F0096BC53 /* he */;
 		};
+		3F493C6A2DDD588A0096BC53 /* Exceptions for "he-test" folder in "Hackers Evolution" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				tests.c,
+			);
+			target = 3F0CE7022DBE039400C20C7E /* Hackers Evolution */;
+		};
+		3F493C6B2DDD588A0096BC53 /* Exceptions for "he-test" folder in "he" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				tests.c,
+			);
+			target = 3F493C492DD45F3F0096BC53 /* he */;
+		};
+		3F493C6F2DDD59A30096BC53 /* Exceptions for "Hackers Evolution" folder in "he-test" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"HELc Sources/helc.c",
+				"HELc Sources/instructions.c",
+			);
+			target = 3F493C622DDD587E0096BC53 /* he-test */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -73,6 +105,7 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				3F493C522DD45F960096BC53 /* Exceptions for "Hackers Evolution" folder in "he" target */,
+				3F493C6F2DDD59A30096BC53 /* Exceptions for "Hackers Evolution" folder in "he-test" target */,
 			);
 			path = "Hackers Evolution";
 			sourceTree = "<group>";
@@ -90,6 +123,15 @@
 		3F493C4B2DD45F3F0096BC53 /* he */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = he;
+			sourceTree = "<group>";
+		};
+		3F493C642DDD587E0096BC53 /* he-test */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				3F493C6A2DDD588A0096BC53 /* Exceptions for "he-test" folder in "Hackers Evolution" target */,
+				3F493C6B2DDD588A0096BC53 /* Exceptions for "he-test" folder in "he" target */,
+			);
+			path = "he-test";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -134,6 +176,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		3F493C602DDD587E0096BC53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -155,6 +204,7 @@
 				3F0CE7142DBE039800C20C7E /* Hackers EvolutionTests */,
 				3F0CE71E2DBE039800C20C7E /* Hackers EvolutionUITests */,
 				3F493C4B2DD45F3F0096BC53 /* he */,
+				3F493C642DDD587E0096BC53 /* he-test */,
 				3F090DEA2DD2C40200839FD9 /* Frameworks */,
 				3F0CE7042DBE039400C20C7E /* Products */,
 			);
@@ -168,6 +218,7 @@
 				3F0CE71B2DBE039800C20C7E /* Hackers EvolutionUITests.xctest */,
 				3F090DE42DD2C3BA00839FD9 /* libhelc.dylib */,
 				3F493C4A2DD45F3F0096BC53 /* he */,
+				3F493C632DDD587E0096BC53 /* he-test */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -298,6 +349,28 @@
 			productReference = 3F493C4A2DD45F3F0096BC53 /* he */;
 			productType = "com.apple.product-type.tool";
 		};
+		3F493C622DDD587E0096BC53 /* he-test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F493C672DDD587E0096BC53 /* Build configuration list for PBXNativeTarget "he-test" */;
+			buildPhases = (
+				3F493C5F2DDD587E0096BC53 /* Sources */,
+				3F493C602DDD587E0096BC53 /* Frameworks */,
+				3F493C612DDD587E0096BC53 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				3F493C642DDD587E0096BC53 /* he-test */,
+			);
+			name = "he-test";
+			packageProductDependencies = (
+			);
+			productName = "he-test";
+			productReference = 3F493C632DDD587E0096BC53 /* he-test */;
+			productType = "com.apple.product-type.tool";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -326,6 +399,9 @@
 					3F493C492DD45F3F0096BC53 = {
 						CreatedOnToolsVersion = 16.3;
 					};
+					3F493C622DDD587E0096BC53 = {
+						CreatedOnToolsVersion = 16.3;
+					};
 				};
 			};
 			buildConfigurationList = 3F0CE6FE2DBE039400C20C7E /* Build configuration list for PBXProject "Hackers Evolution" */;
@@ -351,6 +427,7 @@
 				3F0CE71A2DBE039800C20C7E /* Hackers EvolutionUITests */,
 				3F090DE32DD2C3BA00839FD9 /* helc */,
 				3F493C492DD45F3F0096BC53 /* he */,
+				3F493C622DDD587E0096BC53 /* he-test */,
 			);
 		};
 /* End PBXProject section */
@@ -412,6 +489,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3F493C462DD45F3F0096BC53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3F493C5F2DDD587E0096BC53 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -775,6 +859,30 @@
 			};
 			name = Release;
 		};
+		3F493C682DDD587E0096BC53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EHM929N34N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		3F493C692DDD587E0096BC53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = EHM929N34N;
+				ENABLE_HARDENED_RUNTIME = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -828,6 +936,15 @@
 			buildConfigurations = (
 				3F493C4E2DD45F3F0096BC53 /* Debug */,
 				3F493C4F2DD45F3F0096BC53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3F493C672DDD587E0096BC53 /* Build configuration list for PBXNativeTarget "he-test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F493C682DDD587E0096BC53 /* Debug */,
+				3F493C692DDD587E0096BC53 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

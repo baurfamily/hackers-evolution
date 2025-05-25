@@ -16,7 +16,10 @@ Currently the parser removes all comemnts before executing the program, so they 
 
 Looping
 ```
-#A(0#1%1,1)0%0
+#A,(#1%1,1)0%0
+```
+```
+#A,("
 ```
 
 Leaves stack as:
@@ -40,7 +43,16 @@ General loop strategy: `#A(0 ------ %1,1)0%0`
 * `)0` - mark the end of the loop (value is ignored)
 * `%0` - drop the loop variable, as it's no longer needed
 
-## Working with the stack.
+## Working with the tape.
+
+## Math
+
+Adding numbers 1-4:
+
+```
+#1#2#3#4+++
+```
+
 
 ### Clearing the stack:
 
@@ -89,22 +101,22 @@ These values are too big to enter directly. Since we're trying a differnt method
 ... etc. Spaces added for convienience. If we can get to the value more directly, that style is shown.
 
 ```
-#4#A*1
-#9#6#A*1+1
-#6#7#A*1+1
-#6#7#A*1+1
-#9#7#A*1+1
-#C
+#4#A,*1'
+#9#6#A,*1+1'
+#6#7#A,*1+1'
+#6#7#A,*1+1'
+#9#7#A,*1+1'
+#C'
 #0
-#7#8#A*1+1
+#7#8#A,*1+1'
 #B
-#9#7#A*1+1
-#2#8#A*1+1
-#6#7#A*1+1
-#8#6#A*1+1
+#9#7#A,*1+1'
+#2#8#A,*1+1'
+#6#7#A,*1+1'
+#8#6#A,*1+1'
 ```
 
-Conviniently, 32 is 16 doubled, so just to be different we'll insert 15, double it (add to itself) and add 2: `#F+0'2`.
+Conviniently, 32 is 16 doubled, so just to be different we'll insert 15, double it (add to itself) and add 2: `#F+0'#2,+`.
 
 But we need to do this to each value in the existing stack, which will require a loop. Within the loop, we can DUP the value, we don't need to re-calculate it every time.
 

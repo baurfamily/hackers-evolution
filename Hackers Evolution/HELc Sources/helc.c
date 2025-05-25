@@ -14,62 +14,68 @@
 #include "helc.h"
 #include "instructions.h"
 
-int step(Program *prog, Stack *stack, int additionalVal) {
-    prog->pos = prog->pos + 1;
-    
-    CodePoint code = prog->code[prog->pos];
+int step(Program *prog, Tape *tape, int additionalVal) {
+
+    CodePoint code = CURRENT_PROG;
     Instruction inst = code.inst;
     unsigned int val = code.val + (additionalVal << 4);
     
     if (inst==0) return 0;
     
+    printf("%02d: %c%02d => ", prog->pos, instructionToChar(code.inst), val);
+    
     switch (inst) {
-        case NOP: instNOP(val, prog, stack); break;
-//            case RED: return '!';
-        case DUP: instDUP(val, prog, stack); break;
-        case INS: instINS(val, prog, stack); break;
-        case OUT: instOUT(val, prog, stack); break;
-        case SWP: instSWP(val, prog, stack); break;
-        case AND: instAND(val, prog, stack); break;
-        case INC: instINC(val, prog, stack); break;
-        case ANC: instANC(val, prog, stack); break;
-        case END: instEND(val, prog, stack); break;
-        case MUL: instMUL(val, prog, stack); break;
-        case ADD: instADD(val, prog, stack); break;
-        case DEC: instDEC(val, prog, stack); break;
-        case SUB: instSUB(val, prog, stack); break;
-//            case DAT: return '.';
-        case DIV: instDIV(val, prog, stack); break;
+        case NOP: instNOP(val, prog, tape); break;
+        case RED: instRED(val, prog, tape); break;;
+        case DUP: instDUP(val, prog, tape); break;
+        case INS: instINS(val, prog, tape); break;
+        case OUT: instOUT(val, prog, tape); break;
+        case SWP: instSWP(val, prog, tape); break;
+        case AND: instAND(val, prog, tape); break;
+        case INC: instINC(val, prog, tape); break;
+        case ANC: instANC(val, prog, tape); break;
+        case END: instEND(val, prog, tape); break;
+        case MUL: instMUL(val, prog, tape); break;
+        case ADD: instADD(val, prog, tape); break;
+        case DEC: instDEC(val, prog, tape); break;
+        case SUB: instSUB(val, prog, tape); break;
+        case DAT: instDAT(val, prog, tape); break;;
+        case DIV: instDIV(val, prog, tape); break;
         default:  printf("unmatched instruction\n");
     }
+    MOVE_PROG(1);
     
+    printTape(*tape);
+    
+    if (prog->pos == 0) {
+        return -1;
+    }
     return inst;
 }
 
-void executeWithStack(Program *prog, Stack *stack) {
-    printf("\nProgram execution!\n");
+void executeWithTape(Program *prog, Tape *tape) {
+    printf("\n");
     printProg(prog);
+    printf("\n");
     
-    // init everything
-    for (int i=0; i<PROG_SIZE; i++) {
-        stack->values[i] = 0;
-        stack->pos = -1;
-    }
-    
-    for (int i=0; i<PROG_SIZE; i++) {
-        int returnCode = step(prog, stack, 0);
-        if (returnCode==0) break;
-        
-        printStack(*stack);
+    for (int i=0; i<MAX_EXECUTION; i++) {
+        int returnCode = step(prog, tape, 0);
+        if (returnCode==-1) break;
     }
 }
 
 void execute(Program *prog) {
-    printf("\nProgram execution!\n");
-    printProg(prog);
+    Tape tape = { .values={}, .pos=0 };
+    executeWithTape(prog, &tape);
+}
+
+Tape* tapeFromExecution(Program *prog, Tape *tape) {
+    if (tape == NULL) {
+        tape = newTape();
+    }
+    executeWithTape(prog, tape);
     
-    Stack stack = { .values={}, .pos=-1 };
-    executeWithStack(prog, &stack);
+    return tape;
 }
 
 Instruction charToInstruction(const char c) {
@@ -98,8 +104,8 @@ int defaultForInstruction(Instruction inst) {
     switch (inst) {
         case NOP: return 0;
         case RED: return 1;
-        case DUP: return 0;
-        case INS: return 0;
+        case DUP: return 1;
+        case INS: return 1;
         case OUT: return 0;
         case SWP: return 1;
         case AND: return 10; // no idea on this one
@@ -140,7 +146,7 @@ char instructionToChar(Instruction inst) {
 
 Program* newProg(void) {
     Program* prog = (Program *)malloc(sizeof(Program));
-    prog->pos = -1;
+    prog->pos = 0;
     
     // initialize array to null
     for (int i=0; i<PROG_SIZE; i++) {
@@ -150,15 +156,15 @@ Program* newProg(void) {
     return prog;
 }
 
-Stack* newStack(void) {
-    Stack *stack = (Stack *)malloc(sizeof(Stack));
-    stack->pos = -1;
+Tape* newTape(void) {
+    Tape *tape = (Tape *)malloc(sizeof(Tape));
+    tape->pos = 0;
     
     for (int i=0; i<PROG_SIZE; i++) {
-        stack->values[i] = 0;
+        tape->values[i] = 0;
     }
     
-    return stack;
+    return tape;
 }
 
 Instance* newInstance(void) {
@@ -167,18 +173,33 @@ Instance* newInstance(void) {
     // init everything
     for (int i=0; i<PROG_SIZE; i++) {
         instance->prog.code[i] = (CodePoint){ .inst=0, .val=0 };
-        instance->prog.pos = -1;
-        instance->stack.values[i] = 0;
-        instance->stack.pos = -1;
+        instance->prog.pos = 0;
+        instance->tape.values[i] = 0;
+        instance->tape.pos = 0;
     }
     
     return instance;
 }
 
-void printStack(Stack stack) {
-    for (int i=stack.pos; i>=0; i--) {
-        printf("%d ", stack.values[i]);
+void printTape(Tape tape) {
+    printf("[... ");
+    for (int i=tape.pos-10; i<=tape.pos+10; i++) {
+        int index = ((i > 0 ? i : TAPE_SIZE+i) % TAPE_SIZE);
+        if (i==tape.pos) {
+            if (tape.values[index] == 0) {
+                printf("<.> ");
+            } else {
+                printf("<%d> ", tape.values[index]);
+            }
+        } else {
+            if (tape.values[index] == 0) {
+                printf(". ");
+            } else {
+                printf("%d ", tape.values[index]);
+            }
+        }
     }
+    printf("...]\n");
 }
 
 void printProg(Program *prog) {
@@ -190,18 +211,25 @@ void printProg(Program *prog) {
         char c = instructionToChar(inst);
         str[i] = c;
         val[i] = (int)prog->code[i].val;
-        if (inst == 0)
-            break;
+//        if (inst == 0)
+//            break;
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        if (prog->code[i].inst == 0) break;
         printf("%c%d ", str[i], val[i]);
     
         if ((i+1)%8 == 0) printf("\n");
         
-        if (prog->code[i].inst == 0) break;
+//        if (prog->code[i].inst == 0) break;
     }
+}
+
+// this may not be a "readable" character
+// this one is for the encoded version
+CodePoint codePointFromEncodedChar(const char c) {
+    int inst = c >> 4;
+    int val = c & 15;
+    return (CodePoint) { .inst = inst, .val = val };
 }
 
 CodePoint codePointFromString(const char *str) {
@@ -211,10 +239,30 @@ CodePoint codePointFromString(const char *str) {
     };
 }
 
+Program* progFromBytes(const char *str) {
+    Program *prog = newProg();
+    
+    unsigned long length = strlen(str);
+
+    int i;
+    for (i=0; i<length; i++) {
+        CodePoint cp = codePointFromEncodedChar(str[i]);
+        prog->code[i] = cp;
+        printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
+        
+    }
+    i++;
+    prog->code[i] = (CodePoint){ .inst=0, .val=0 };
+    
+    return prog;
+}
+
 Program* progFromString(const char *str) {
     Program *prog = newProg();
     
     unsigned long length = strlen(str);
+    
+    int skipData = 0;
 
     int j=0;
     bool comment = false;
@@ -225,12 +273,28 @@ Program* progFromString(const char *str) {
             comment = false;
         } else {
             if (!comment) {
-                char *endptr;
+                if (skipData > 0) {
+                    CodePoint cp = codePointFromEncodedChar(str[i]);
+                    prog->code[j] = cp;
+                    j++;
+                    skipData--;
+                    
+                    printf("(%d, %d): dat: %c/%d => %d\n", i, j, instructionToChar(cp.inst), cp.val, (cp.inst << 4) | cp.val);
+                    continue;
+                }
                 errno = 0;
                 Instruction inst = charToInstruction(str[i]);
-                int val = (unsigned int)strtol(&str[i+1], &endptr, 16);
+                const char maybeVal[2] = { str[i+1] };
+                int val = (unsigned int)strtol(maybeVal, NULL, 16);
                 
-                if (errno == 0) {
+                if (str[i+1] == '+' || str[i+1] == '-') {
+                    // there is a weird edge case where you have an
+                    // addition operator directly after another instruction
+                    // the strtol is totally okay with just a unary '+'
+                    // but we don't consider that a number
+                    // even if it *is* a number, we don't want it parsed
+                    val = defaultForInstruction(inst);
+                } else if (errno == 0) {
                     // no error on conversion means we found a value
                     // no increment the parsing position
                     i++;
@@ -238,7 +302,11 @@ Program* progFromString(const char *str) {
                     // otherwise, go looking for a reasonable default value
                     val = defaultForInstruction(inst);
                 }
-//                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+
+                if (inst == DAT) {
+                    skipData = val;
+                }
+                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }
