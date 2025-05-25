@@ -79,12 +79,12 @@ To clear the entire stack, you can use the stack-based loop, which continues as 
 Using the data and read instructions:
 
 ```
-.DHello, world.!D(1,)$
+.DHello, world.!(1,)$
 ```
 
 This can be run on the command line with:
 ```
-he --execute=".DHello, world.!D(1,)$0"
+he --execute=".DHello, world.!(1,)$0"
 ```
 
 Let's break this down into four main steps.
@@ -95,7 +95,7 @@ The `.D` instruction causes the program to interpret the next 13 bytes as ASCII 
 
 #### Read data into the tape
 
-The `!D` instruction says to read 12 (D in hex) characters after the first data instruction and insert the ASCII value into the tape. After each insertion, the tape pointer is moved 1, so after all the insertions the pointer will be just after the last element, pointing to an empty tape slot.
+The `!` instruction says to read characters after the first data instruction and insert the ASCII value into the tape. Since no argument was given to this instruction, it reads "all" the caracters after the data instructin. After each insertion, the tape pointer is moved 1, so after all the insertions the pointer will be just after the last element, pointing to an empty tape slot.
 
 #### Rewind loop
 
@@ -112,6 +112,8 @@ Finally, the `$` tells the program to output a string from the ASCII values stor
 ### A word about defaults
 
 There are a couple places in which we do not have a number after the instruction. In these cases, a reasonable default is assumed, which may be different depending on the instruction.
+
+As mentioned above, the default for `!` is 0, which casues it to deletgate to the `.` value to know how many characters to read.
 
 For `,` the default is 1. For `$` the default is 0 (ie: read all). For `(` the normal default is 0, but we overrode that to 1 to not have to move the pointer before starting. Instead of `(1,)` we could have just as easily done `,(,)` for the same result.
 

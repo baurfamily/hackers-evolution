@@ -61,12 +61,16 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--execute=&quot;.DHello, world.!D(1,)$&quot;"
+            argument = "--execute=&quot;.DHello, world.!(1,)$&quot;"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--execute=&quot;.HelloWorld#1 #2#3&quot;"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--verbose"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--quiet"

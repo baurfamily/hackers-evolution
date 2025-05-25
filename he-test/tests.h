@@ -37,3 +37,4 @@ void test_canDoMath(void);
 void test_tapeManipulation_moving(void);
 void test_tapeManipulation_swap(void);
 void test_readingData(void);
+void test_dataAndReadEdgeCases(void);

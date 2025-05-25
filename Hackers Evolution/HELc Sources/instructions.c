@@ -16,10 +16,14 @@ void instNOP(int val, Program *prog, Tape *tape) {
 }
 
 void instRED(int val, Program *prog, Tape *tape) {
-    findDAT(prog);
+    int datVal = findDAT(prog);
     
+    // dataPos may have been modiifed by previous call
     int start = prog->dataPos;
-    int end = prog->dataPos + val;
+    
+    // if val was zero, use val from data element
+    // which could also be 0  - or not found (and be 0)
+    int end = prog->dataPos + (val == 0 ? datVal : val);
     
     for (int i=start; i<end; i++) {
         CodePoint cp = prog->code[i];
@@ -31,16 +35,28 @@ void instRED(int val, Program *prog, Tape *tape) {
     prog->dataPos = end % PROG_SIZE;
 }
 
-void findDAT(Program *prog) {
+// return the val of the data element we found
+int findDAT(Program *prog) {
     for (int i=prog->dataPos; i<PROG_SIZE; i++) {
         if (prog->code[i].inst == DAT) {
             prog->dataPos += i + 1;
-            return;
+            
+            if (prog->code[i].val == 0) {
+                for (int j=0; j<PROG_SIZE; j++) {
+                    CodePoint cp = prog->code[PROG_DELTA(j)];
+                    if (cp.inst == 0 && cp.val == 0) {
+                        return j;
+                    }
+                }
+            } else {
+                return prog->code[i].val;
+            }
         }
     }
     // okay, not sure this makes sense, but if we don't find a DAT mark
     // we'll just keep reading from where we left off (which might have
     // been the start of the program if there are no DAT instructions
+    return 0;
 }
 
 //TODO: so much more to implement here...
@@ -236,7 +252,17 @@ void instDAT(int val, Program *prog, Tape *tape)  {
     // prog steps that are considered data
     // this is NOT validated on read, only used to skip
     // what we *assume* are not valid program instructions
-    MOVE_PROG(val);
+    // val of 0 means "skip until a zero"
+    if (val == 0) {
+        for (int i=0; i<PROG_SIZE; i++) {
+            MOVE_PROG(1);
+            if (CURRENT_PROG.inst == 0 && CURRENT_PROG.val == 0) {
+                break;
+            }
+        }
+    } else {
+        MOVE_PROG(val);
+    }
 }
 
 void instDIV(int val, Program *prog, Tape *tape) {
