@@ -23,9 +23,9 @@ static int verbose_flag;
 static int byte_encoded;
 
 int main(int argc, const char *argv[]) {
-    srand((unsigned int)time(NULL));
     int c;
     int numBytes;
+    unsigned int seed;
     bool repl = false;
     Program *prog = NULL;
     
@@ -72,6 +72,11 @@ int main(int argc, const char *argv[]) {
                 break;
                 
             case 'r':
+                seed = (unsigned int)time(NULL);
+                srand(seed);
+                if (verbose_flag) {
+                    printf("seed: %d", seed);
+                }
                 numBytes = (unsigned int)strtol(optarg, NULL, 16);
                 prog = progFromBytes(generateBytes(numBytes));
                 break;
@@ -178,7 +183,7 @@ void runRepl(Program *prog, Tape *tape) {
             CodePoint cp = inputProg->code[i];
             if (cp.inst != NOP) {
                 prog->code[prog->pos+i] = cp;
-                printf("wrote instruction: %d => ( %c, %d )", prog->pos, instructionToChar(cp.inst), cp.val);
+//                printf("wrote instruction: %d => ( %c, %d )", prog->pos, instructionToChar(cp.inst), cp.val);
             }
         }
         

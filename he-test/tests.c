@@ -214,4 +214,15 @@ void test_readingData(void) {
     tape = RUN(".5ABCDE!2");
     ASSERT_VALUE_AT(-2, 65);
     ASSERT_VALUE_AT(-1, 66);
+    
+    // over-read
+    tape = RUN(".1A!2");
+    ASSERT_VALUE_AT(-2, 65);
+    // effective value of "!2"
+    ASSERT_VALUE_AT(-1, 18);
+    
+    // no data section, reads from start
+    tape = RUN("!2");
+    ASSERT_VALUE_AT(-2, 18);
+    ASSERT_VALUE_AT(-1, 0);
 }

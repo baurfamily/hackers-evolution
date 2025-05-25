@@ -211,17 +211,16 @@ void printProg(Program *prog) {
         char c = instructionToChar(inst);
         str[i] = c;
         val[i] = (int)prog->code[i].val;
-        if (inst == 0)
-            break;
+//        if (inst == 0)
+//            break;
     }
     
     for (int i=0; i<PROG_SIZE; i++) {
-        if (prog->code[i].inst == 0) break;
         printf("%c%d ", str[i], val[i]);
     
         if ((i+1)%8 == 0) printf("\n");
         
-        if (prog->code[i].inst == 0) break;
+//        if (prog->code[i].inst == 0) break;
     }
 }
 

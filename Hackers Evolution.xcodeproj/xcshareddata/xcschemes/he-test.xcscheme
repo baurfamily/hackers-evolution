@@ -15,9 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3F493C492DD45F3F0096BC53"
-               BuildableName = "he"
-               BlueprintName = "he"
+               BlueprintIdentifier = "3F493C622DDD587E0096BC53"
+               BuildableName = "he-test"
+               BlueprintName = "he-test"
                ReferencedContainer = "container:Hackers Evolution.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,38 +45,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F493C492DD45F3F0096BC53"
-            BuildableName = "he"
-            BlueprintName = "he"
+            BlueprintIdentifier = "3F493C622DDD587E0096BC53"
+            BuildableName = "he-test"
+            BlueprintName = "he-test"
             ReferencedContainer = "container:Hackers Evolution.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <CommandLineArguments>
-         <CommandLineArgument
-            argument = "--execute=#1#2#3#4#5#6#7#8#9#A#B"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--execute=.5Hello!5"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--execute=.5ABCDE!3"
-            isEnabled = "NO">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--verbose"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--interactive"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "--byte-encoded"
-            isEnabled = "NO">
-         </CommandLineArgument>
-      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -88,9 +62,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "3F493C492DD45F3F0096BC53"
-            BuildableName = "he"
-            BlueprintName = "he"
+            BlueprintIdentifier = "3F493C622DDD587E0096BC53"
+            BuildableName = "he-test"
+            BlueprintName = "he-test"
             ReferencedContainer = "container:Hackers Evolution.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
