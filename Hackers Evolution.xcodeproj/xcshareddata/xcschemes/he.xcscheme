@@ -66,11 +66,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--execute=&quot;.HelloWorld#1 #2#3&quot;"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--verbose"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--quiet"

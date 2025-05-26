@@ -14,12 +14,12 @@ bool isVerbose(void);
 bool isQuiet(void);
 
 int main(int argc, const char * argv[]) {
-//    test_canParse();
-//    test_canDoMath();
-//    test_canLoop();
-//    test_tapeManipulation_moving();
-//    test_tapeManipulation_swap();
-//    test_readingData();
+    test_canParse();
+    test_canDoMath();
+    test_canLoop();
+    test_tapeManipulation_moving();
+    test_tapeManipulation_swap();
+    test_readingData();
     test_dataAndReadEdgeCases();
     
     return 0;

@@ -10,13 +10,16 @@
 #include "tests.h"
 
 void test_canParse(void) {
+    printf("\n----------------\n");
+    printf("test_canParse");
+    printf("\n----------------\n");
     Program *prog;
     
     // using implict values
     // note the extra value after the dot
-    prog = PARSE(" !\"#$%&'()*+,-.X/");
+    prog = PARSE(" !\"#$%&'()*+,-. /");
     ASSERT(prog->code[0].inst == NOP); ASSERT(prog->code[0].val == 0);
-    ASSERT(prog->code[1].inst == RED); ASSERT(prog->code[1].val == 1);
+    ASSERT(prog->code[1].inst == RED); ASSERT(prog->code[1].val == 0);
     ASSERT(prog->code[2].inst == DUP); ASSERT(prog->code[2].val == 1);
     ASSERT(prog->code[3].inst == INS); ASSERT(prog->code[3].val == 1);
     ASSERT(prog->code[4].inst == OUT); ASSERT(prog->code[4].val == 0);
@@ -29,9 +32,9 @@ void test_canParse(void) {
     ASSERT(prog->code[11].inst == ADD); ASSERT(prog->code[11].val == 1);
     ASSERT(prog->code[12].inst == DEC); ASSERT(prog->code[12].val == 1);
     ASSERT(prog->code[13].inst == SUB); ASSERT(prog->code[13].val == 1);
-    ASSERT(prog->code[14].inst == DAT); ASSERT(prog->code[14].val == 1);
-    // this is the "X" ASCII value, interpreted as a CodePoint
-    ASSERT(prog->code[15].inst == SWP); ASSERT(prog->code[15].val == 8);
+    ASSERT(prog->code[14].inst == DAT); ASSERT(prog->code[14].val == 0);
+    // this is the space that stops the dat reading
+    ASSERT(prog->code[15].inst == NOP); ASSERT(prog->code[15].val == 0);
     ASSERT(prog->code[16].inst == DIV); ASSERT(prog->code[16].val == 1);
     
     prog = PARSE("#1+1+1");
@@ -43,14 +46,17 @@ void test_canParse(void) {
 }
 
 void test_canLoop(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_canLoop");
+    printf("\n----------------\n");
+    SETUP
     
     // rewind tape
-    tape = RUN("#2#1#1#1,(,)'");
+    RUN("#2#1#1#1,(,)'");
     ASSERT_VALUE(2);
     
     // one way to generate multiple numbers via a loop
-    tape = RUN("#4,('#1,3#1%-)'");
+    RUN("#4,('#1,3#1%-)'");
     ASSERT_VALUE_AT(0,0);
     ASSERT_VALUE_AT(1,1);
     ASSERT_VALUE_AT(2,1);
@@ -59,7 +65,7 @@ void test_canLoop(void) {
     ASSERT_VALUE_AT(5,0);
     
     // delete all values: (-0,)
-    tape = RUN("#1#1#1#1#1#1#1,(-0,)");
+    RUN("#1#1#1#1#1#1#1,(-0,)");
     for (int i=0; i<PROG_SIZE; i++) {
         ASSERT_VALUE_AT(i,0);
     }
@@ -84,7 +90,7 @@ void test_canLoop(void) {
     // ,       <-- shift back to insert a marker
     // #F
     // ,
-    tape = RUN("#5#1(('),\"(2,)-'#1)2,#F,");
+    RUN("#5#1(('),\"(2,)-'#1)2,#F,");
     ASSERT_VALUE_AT(0,15);
     ASSERT_VALUE_AT(1,1);
     ASSERT_VALUE_AT(2,1);
@@ -94,63 +100,69 @@ void test_canLoop(void) {
 }
 
 void test_canDoMath(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_canDoMath");
+    printf("\n----------------\n");
+    SETUP
     
     // in a row
-    tape = RUN("#1#2#3#4,+++");
+    RUN("#1#2#3#4,+++");
     ASSERT_VALUE(10);
     
     // testing addition
-    tape = RUN("#3#2,+1");
+    RUN("#3#2,+1");
     ASSERT_VALUE(5);
     
     // testing addition (with implicit arguments)
-    tape = RUN("#3#2,+");
+    RUN("#3#2,+");
     ASSERT_VALUE(5);
 
     // doubling
-    tape = RUN("#3,+0");
+    RUN("#3,+0");
     ASSERT_VALUE(6);
     
     // adding at distance
-    tape = RUN("#1#2#3,+2");
+    RUN("#1#2#3,+2");
     ASSERT_VALUE(4);
     
     //subtraction
-    tape = RUN("#3#2,-");
+    RUN("#3#2,-");
     ASSERT_VALUE(1)
     
     //removal (additive identity)
-    tape = RUN("#3,-0");
+    RUN("#3,-0");
     ASSERT_VALUE(0)
     
     //multiplication
-    tape = RUN("#2#3,*");
+    RUN("#2#3,*");
     ASSERT_VALUE(6);
     
     // squaring
-    tape = RUN("#3,*0");
+    RUN("#3,*0");
     ASSERT_VALUE(9);
     
     // dividing
-    tape = RUN("#A#2,/");
+    RUN("#A#2,/");
     ASSERT_VALUE(5);
     
     // division truncates
-    tape = RUN("#A#3,/");
+    RUN("#A#3,/");
     ASSERT_VALUE(3);
     
     // multiplicitive identity
-    tape = RUN("#3,/0");
+    RUN("#3,/0");
     ASSERT_VALUE(1);
     
 }
 
 void test_tapeManipulation_moving(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_tapeManipulation_moving");
+    printf("\n----------------\n");
+    SETUP
     
     //setup
-    tape = RUN("#1#2#3#4#5#6#7#8#9");
+    RUN("#1#2#3#4#5#6#7#8#9");
     
     RUN_MORE(",");
     ASSERT_VALUE(9);
@@ -179,10 +191,13 @@ void test_tapeManipulation_moving(void) {
 }
 
 void test_tapeManipulation_swap(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_tapeManipulation_swap");
+    printf("\n----------------\n");
+    SETUP
     
     //setup
-    tape = RUN("#1#2#3#4#5#6#7#8#9");
+    RUN("#1#2#3#4#5#6#7#8#9");
     
     RUN_MORE(",5%");
     ASSERT_VALUE_AT(-1, 5);
@@ -203,38 +218,44 @@ void test_tapeManipulation_swap(void) {
 }
 
 void test_readingData(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_readingData");
+    printf("\n----------------\n");
+    SETUP
     
     // nothing read, noting in tape
-    tape = RUN(".5ABCDE!0");
-    ASSERT(tape->pos == 0);
+    RUN(".5ABCDE!0");
+    ASSERT(prog->tapePos == 5);
     ASSERT_VALUE(0);
     
     // read two values
-    tape = RUN(".5ABCDE!2");
+    RUN(".5ABCDE!2");
     ASSERT_VALUE_AT(-2, 65);
     ASSERT_VALUE_AT(-1, 66);
     
     // over-read
-    tape = RUN(".1A!2");
+    RUN(".1A!2");
     ASSERT_VALUE_AT(-2, 65);
     // effective value of "!2"
     ASSERT_VALUE_AT(-1, 18);
     
     // no data section, reads from start
-    tape = RUN("!2");
+    RUN("!2");
     ASSERT_VALUE_AT(-2, 18);
     ASSERT_VALUE_AT(-1, 0);
 }
 
 void test_dataAndReadEdgeCases(void) {
-    Tape *tape;
+    printf("\n----------------\n");
+    printf("test_dataAndReadEdgeCases");
+    printf("\n----------------\n");
+    SETUP
     
-    tape = RUN(".XYZ#1 #2#3");
+    RUN(".XYZ#1 #2#3");
     ASSERT_VALUE_AT(-2, 2);
     ASSERT_VALUE_AT(-1, 3);
     
-    tape = RUN(".XYZ !");
+    RUN(".XYZ !");
     ASSERT_VALUE_AT(PROG_SIZE, 0);
     ASSERT_VALUE_AT(-3, 88);
     ASSERT_VALUE_AT(-2, 89);
