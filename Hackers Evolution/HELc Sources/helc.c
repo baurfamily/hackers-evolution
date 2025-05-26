@@ -48,7 +48,7 @@ int step(Program *prog, Tape *tape, int additionalVal) {
     }
     MOVE_PROG(1);
     
-    if (!isQuiet()) printTape(*tape);
+    if (!isQuiet()) printTape(*tape, prog->tapePos);
     
     if (prog->pos == 0) {
         return -1;
@@ -70,7 +70,7 @@ void executeWithTape(Program *prog, Tape *tape) {
 }
 
 void execute(Program *prog) {
-    Tape tape = { .values={}, .pos=0 };
+    Tape tape = { .values={} };
     executeWithTape(prog, &tape);
 }
 
@@ -163,7 +163,6 @@ Program* newProg(void) {
 
 Tape* newTape(void) {
     Tape *tape = (Tape *)malloc(sizeof(Tape));
-    tape->pos = 0;
     
     for (int i=0; i<PROG_SIZE; i++) {
         tape->values[i] = 0;
@@ -172,25 +171,11 @@ Tape* newTape(void) {
     return tape;
 }
 
-Instance* newInstance(void) {
-    Instance *instance = (Instance *)malloc(sizeof(Instance));
-    
-    // init everything
-    for (int i=0; i<PROG_SIZE; i++) {
-        instance->prog.code[i] = (CodePoint){ .inst=0, .val=0 };
-        instance->prog.pos = 0;
-        instance->tape.values[i] = 0;
-        instance->tape.pos = 0;
-    }
-    
-    return instance;
-}
-
-void printTape(Tape tape) {
+void printTape(Tape tape, int pos) {
     printf("\n[... ");
-    for (int i=tape.pos-10; i<=tape.pos+10; i++) {
+    for (int i=pos-10; i<=pos+10; i++) {
         int index = ((i > 0 ? i : TAPE_SIZE+i) % TAPE_SIZE);
-        if (i==tape.pos) {
+        if (i==pos) {
             if (tape.values[index] == 0) {
                 printf("<.> ");
             } else {
@@ -204,7 +189,7 @@ void printTape(Tape tape) {
             }
         }
     }
-    printf("...]");
+    printf("...] (%d)", pos);
 }
 
 void printProg(Program *prog) {

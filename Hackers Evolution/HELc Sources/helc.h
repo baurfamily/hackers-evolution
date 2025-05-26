@@ -52,12 +52,13 @@ typedef struct CodePoint {
 typedef struct Program {
     int pos;
     int dataPos;
+    int tapePos;
     CodePoint code[PROG_SIZE];
 } Program;
 
 typedef struct Tape {
-    int pos;
-    int values[TAPE_SIZE];
+//    int pos;
+    char values[TAPE_SIZE];
 } Tape;
 
 typedef struct Instance {
@@ -73,7 +74,7 @@ int step(Program *prog, Tape *tape, int additionalValue);
 void executeWithTape(Program *prog, Tape *tape);
 void execute(Program *prog);
 Tape* tapeFromExecution(Program *prog, Tape *tape);
-void printTape(Tape tape);
+void printTape(Tape tape, int pos);
 void printProg(Program *program);
 
 Program* newProg(void);

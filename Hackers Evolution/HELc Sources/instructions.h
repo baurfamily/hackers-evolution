@@ -12,9 +12,9 @@
 #define PROG_DELTA(val) ((PROG_SIZE + prog->pos + val) % PROG_SIZE)
 #define CURRENT_PROG (prog->code[prog->pos])
 
-#define TAPE_DELTA(val) ((TAPE_SIZE + tape->pos + val) % TAPE_SIZE)
-#define MOVE_TAPE(val) tape->pos = TAPE_DELTA(val)
-#define CURRENT_VALUE (tape->values[tape->pos])
+#define TAPE_DELTA(val) ((TAPE_SIZE + prog->tapePos + val) % TAPE_SIZE)
+#define MOVE_TAPE(val) prog->tapePos = TAPE_DELTA(val)
+#define CURRENT_VALUE (tape->values[prog->tapePos])
 #define PREVIOUS_VALUE (tape->values[TAPE_DELTA(-1)])
 #define VALUE_AT(val) (tape->values[TAPE_DELTA(val)])
 // implicitly subtracts
