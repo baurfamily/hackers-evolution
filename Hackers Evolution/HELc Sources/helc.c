@@ -220,6 +220,7 @@ void printProg(Program *prog) {
 //            break;
     }
     
+    printf("\n");
     for (int i=0; i<PROG_SIZE; i++) {
         printf("%c%d ", str[i], val[i]);
     
@@ -253,8 +254,9 @@ Program* progFromBytes(const char *str) {
     for (i=0; i<length; i++) {
         CodePoint cp = codePointFromEncodedChar(str[i]);
         prog->code[i] = cp;
-        printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
-        
+        if (isVerbose()) {
+            printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
+        }
     }
     i++;
     prog->code[i] = (CodePoint){ .inst=0, .val=0 };
@@ -344,4 +346,13 @@ Program* progFromString(const char *str) {
     prog->code[j] = (CodePoint){ .inst=0, .val=0 };
     
     return prog;
+}
+
+bool progIsEmpty(Program prog) {
+    for (int i=0; i<PROG_SIZE; i++) {
+        if (prog.code[i].inst != 0 || prog.code[i].val != 0) {
+            return false;
+        }
+    }
+    return true;
 }

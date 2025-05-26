@@ -36,20 +36,35 @@ void instRED(int val, Program *prog, Tape *tape) {
 }
 
 // return the val of the data element we found
+// OR, if it was zero, find the length of the data
+// OR, if nothing else, return 0
 int findDAT(Program *prog) {
-    for (int i=prog->dataPos; i<PROG_SIZE; i++) {
-        if (prog->code[i].inst == DAT) {
-            prog->dataPos += i + 1;
-            
-            if (prog->code[i].val == 0) {
+    for (int i=0; i<PROG_SIZE; i++) {
+        int consideredPos = (prog->dataPos + i) % PROG_SIZE;
+        CodePoint cp = prog->code[consideredPos];
+        
+        if (cp.inst == DAT) {
+            // set the new data position
+            prog->dataPos = (consideredPos + 1) % PROG_SIZE;
+            if (cp.val == 0) {
+                // look for end of data
                 for (int j=0; j<PROG_SIZE; j++) {
-                    CodePoint cp = prog->code[PROG_DELTA(j)];
-                    if (cp.inst == 0 && cp.val == 0) {
-                        return j;
+                    int finalConsideredPos = (consideredPos + j) % PROG_SIZE;
+                    
+                    CodePoint cpEnd = prog->code[finalConsideredPos];
+                    if (cpEnd.inst == 0 && cpEnd.val == 0) {
+                        
+                        
+                        // return the number of data elements available to read
+                        return finalConsideredPos - consideredPos - 1;
                     }
                 }
             } else {
-                return prog->code[i].val;
+                // set our current data position
+                prog->dataPos = (consideredPos+1) % PROG_SIZE;
+                
+                // just return the data value
+                return cp.val;
             }
         }
     }

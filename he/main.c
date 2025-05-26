@@ -30,6 +30,9 @@ int main(int argc, const char *argv[]) {
     int numBytes;
     unsigned int seed;
     bool repl = false;
+    
+    int executeCount = 1;
+    
     Program *prog = NULL;
     
     while (1)
@@ -44,6 +47,7 @@ int main(int argc, const char *argv[]) {
              We distinguish them by their indices. */
             {"version",     no_argument,       0, 'v'},
             {"interactive", no_argument,       0, 'i'},
+            {"recurse",     required_argument, 0, 'R'},
             {"random",      required_argument, 0, 'r'},
             {"execute",     required_argument, 0, 'e'},
 //            {"file",        required_argument, 0, 'f'},
@@ -52,7 +56,7 @@ int main(int argc, const char *argv[]) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
         
-        c = getopt_long (argc, argv, "vbirqe:",
+        c = getopt_long (argc, argv, "vbiqr:R:e:",
                          long_options, &option_index);
         
         /* Detect the end of the options. */
@@ -75,13 +79,17 @@ int main(int argc, const char *argv[]) {
                 repl = true;
                 break;
                 
+            case 'R':
+                executeCount = (unsigned int)strtol(optarg, NULL, 10);
+                break;
+                
             case 'r':
                 seed = (unsigned int)time(NULL);
                 srand(seed);
                 if (verbose_flag) {
                     printf("seed: %d", seed);
                 }
-                numBytes = (unsigned int)strtol(optarg, NULL, 16);
+                numBytes = (unsigned int)strtol(optarg, NULL, 10);
                 prog = progFromBytes(generateBytes(numBytes));
                 break;
                 
@@ -121,30 +129,46 @@ int main(int argc, const char *argv[]) {
         putchar ('\n');
     }
     
-    if (prog != NULL) {
-        Tape *tape = tapeFromExecution(prog, NULL);
-        
-        if (repl) {
+    for (int i=0; i<executeCount; i++) {
+        Tape *tape = newTape();
+        if (prog != NULL) {
+             tape = tapeFromExecution(prog, NULL);
+            
+            if (repl) {
+                runRepl(prog, tape);
+            }
+        } else if (repl) {
             runRepl(prog, tape);
         }
-    } else if (repl) {
-        runRepl(prog, NULL);
+        if (!isQuiet()) printProg(prog);
+        
+        free(prog);
+        
+        if (executeCount > 1) {
+            prog = progFromBytes((char*)tape->values);
+            if (progIsEmpty(*prog)) {
+                if (!isQuiet()) {
+                    printf("Resulting program from tape is empty. Skipping recursion.");
+                    break;
+                }
+            }
+        }
     }
-    free(prog);
+
     
     printf("\n");
     exit (0);
 }
 
 const char *generateBytes(size_t num_bytes) {
-  unsigned char *stream = malloc (num_bytes);
-  size_t i;
-
-  for (i = 0; i < num_bytes; i++) {
-    stream[i] = rand ();
-  }
-
-  return stream;
+    unsigned char *stream = malloc (num_bytes);
+    size_t i;
+    
+    for (i = 0; i < num_bytes; i++) {
+        stream[i] = rand ();
+    }
+ 
+    return stream;
 }
 
 bool isVerbose(void) {
@@ -186,7 +210,6 @@ void runRepl(Program *prog, Tape *tape) {
             break;
         }
         
-        
         Program *inputProg = progFromString(input);
         
         // if there was only one instruction with no
@@ -205,10 +228,9 @@ void runRepl(Program *prog, Tape *tape) {
         while (returnCode) {
             returnCode = step(prog, tape, 0);
         }
-        if (isVerbose()) printProg(prog);
+        if (!isQuiet()) printProg(prog);
         
 //        printTape(*tape);
         printf("\n");
     }
-    
 }

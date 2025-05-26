@@ -235,7 +235,9 @@ void test_dataAndReadEdgeCases(void) {
     ASSERT_VALUE_AT(-1, 3);
     
     tape = RUN(".XYZ !");
+    ASSERT_VALUE_AT(PROG_SIZE, 0);
     ASSERT_VALUE_AT(-3, 88);
     ASSERT_VALUE_AT(-2, 89);
     ASSERT_VALUE_AT(-1, 90);
+    ASSERT_VALUE_AT( 0, 0);
 }
