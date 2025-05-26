@@ -66,11 +66,23 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
+            argument = "--seed=-1311815674"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--recurse=10"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "--verbose"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
             argument = "--byte-encoded"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--random=10"
+            argument = "--random=30"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

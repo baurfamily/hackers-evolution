@@ -23,7 +23,7 @@
 
 void instNOP(int val, Program *prog, Tape *tape);
 void instRED(int val, Program *prog, Tape *tape);
-void findDAT(Program *prog);
+int findDAT(Program *prog);
 void instDUP(int val, Program *prog, Tape *tape);
 void instINS(int val, Program *prog, Tape *tape);
 void instOUT(int val, Program *prog, Tape *tape);

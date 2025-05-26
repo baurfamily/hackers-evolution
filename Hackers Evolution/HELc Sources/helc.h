@@ -11,8 +11,10 @@
 #ifndef HELC_H
 #define HELC_H
 
-#define PROG_SIZE 24
-#define TAPE_SIZE 24
+#include <stdbool.h>
+
+#define PROG_SIZE 128
+#define TAPE_SIZE 128
 
 #define MAX_EXECUTION 10000
 
@@ -81,5 +83,6 @@ CodePoint codePointFromEncodedChar(const char str);
 CodePoint codePointFromString(const char *str);
 Program* progFromBytes(const char *str);
 Program* progFromString(const char *str);
+bool progIsEmpty(Program prog);
 
 #endif

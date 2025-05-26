@@ -16,10 +16,14 @@ void instNOP(int val, Program *prog, Tape *tape) {
 }
 
 void instRED(int val, Program *prog, Tape *tape) {
-    findDAT(prog);
+    int datVal = findDAT(prog);
     
+    // dataPos may have been modiifed by previous call
     int start = prog->dataPos;
-    int end = prog->dataPos + val;
+    
+    // if val was zero, use val from data element
+    // which could also be 0  - or not found (and be 0)
+    int end = prog->dataPos + (val == 0 ? datVal : val);
     
     for (int i=start; i<end; i++) {
         CodePoint cp = prog->code[i];
@@ -28,19 +32,46 @@ void instRED(int val, Program *prog, Tape *tape) {
         CURRENT_VALUE = (cp.inst << 4) | cp.val;
         MOVE_TAPE(1);
     }
-    prog->dataPos = end;
+    prog->dataPos = end % PROG_SIZE;
 }
 
-void findDAT(Program *prog) {
-    for (int i=prog->dataPos; i<PROG_SIZE; i++) {
-        if (prog->code[i].inst == DAT) {
-            prog->dataPos += i + 1;
-            return;
+// return the val of the data element we found
+// OR, if it was zero, find the length of the data
+// OR, if nothing else, return 0
+int findDAT(Program *prog) {
+    for (int i=0; i<PROG_SIZE; i++) {
+        int consideredPos = (prog->dataPos + i) % PROG_SIZE;
+        CodePoint cp = prog->code[consideredPos];
+        
+        if (cp.inst == DAT) {
+            // set the new data position
+            prog->dataPos = (consideredPos + 1) % PROG_SIZE;
+            if (cp.val == 0) {
+                // look for end of data
+                for (int j=0; j<PROG_SIZE; j++) {
+                    int finalConsideredPos = (consideredPos + j) % PROG_SIZE;
+                    
+                    CodePoint cpEnd = prog->code[finalConsideredPos];
+                    if (cpEnd.inst == 0 && cpEnd.val == 0) {
+                        
+                        
+                        // return the number of data elements available to read
+                        return finalConsideredPos - consideredPos - 1;
+                    }
+                }
+            } else {
+                // set our current data position
+                prog->dataPos = (consideredPos+1) % PROG_SIZE;
+                
+                // just return the data value
+                return cp.val;
+            }
         }
     }
     // okay, not sure this makes sense, but if we don't find a DAT mark
     // we'll just keep reading from where we left off (which might have
     // been the start of the program if there are no DAT instructions
+    return 0;
 }
 
 //TODO: so much more to implement here...
@@ -62,41 +93,13 @@ void instINS(int val, Program *prog, Tape *tape) {
 
 // this seems inefficient...
 void instOUT(int val, Program *prog, Tape *tape) {
-    bool oneVal   = ( val & 1 );
-    bool decimal  = ( val & 2 );
-//    bool notImp   = ( val & 4 );
-    bool reversed = ( val & 8 );
+    int end = val == 0 ? PROG_SIZE : val;
     
-    if (oneVal) {
-        int pos = (reversed ? tape->pos : 0);
-        
-        if (decimal) {
-            printf("%d", tape->values[pos]);
-        } else {
-            printf("%c", (char)tape->values[pos]);
-        }
-    } else {
-        if (reversed) {
-            for (int i=tape->pos; i>=0; i--) {
-                if (decimal) {
-                    printf("%d ", tape->values[i]);
-                } else {
-                    printf("%c", (char)tape->values[i]);
-                }
-            }
-        } else {
-            for (int i=0; i<=tape->pos; i++) {
-                if (decimal) {
-                    printf("%d ", tape->values[i]);
-                } else {
-                    printf("%c", (char)tape->values[i]);
-                }
-            }
-        }
+    for (int i=0; i<end; i++) {
+        if (CURRENT_VALUE == 0) break;
+        printf("%c", CURRENT_VALUE);
+        MOVE_TAPE(1);
     }
-    
-    // not sure if I really want this
-    printf("\n");
 }
 
 void instSWP(int val, Program *prog, Tape *tape) {
@@ -264,7 +267,17 @@ void instDAT(int val, Program *prog, Tape *tape)  {
     // prog steps that are considered data
     // this is NOT validated on read, only used to skip
     // what we *assume* are not valid program instructions
-    MOVE_PROG(val);
+    // val of 0 means "skip until a zero"
+    if (val == 0) {
+        for (int i=0; i<PROG_SIZE; i++) {
+            MOVE_PROG(1);
+            if (CURRENT_PROG.inst == 0 && CURRENT_PROG.val == 0) {
+                break;
+            }
+        }
+    } else {
+        MOVE_PROG(val);
+    }
 }
 
 void instDIV(int val, Program *prog, Tape *tape) {

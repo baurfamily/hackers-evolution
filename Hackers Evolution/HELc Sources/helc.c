@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "main.h"
 #include "helc.h"
 #include "instructions.h"
 
@@ -22,7 +23,9 @@ int step(Program *prog, Tape *tape, int additionalVal) {
     
     if (inst==0) return 0;
     
-    printf("%02d: %c%02d => ", prog->pos, instructionToChar(code.inst), val);
+    if (isVerbose()) {
+        printf("\n%02d: %c%02d => ", prog->pos, instructionToChar(code.inst), val);
+    }
     
     switch (inst) {
         case NOP: instNOP(val, prog, tape); break;
@@ -45,7 +48,7 @@ int step(Program *prog, Tape *tape, int additionalVal) {
     }
     MOVE_PROG(1);
     
-    printTape(*tape);
+    if (!isQuiet()) printTape(*tape);
     
     if (prog->pos == 0) {
         return -1;
@@ -54,9 +57,11 @@ int step(Program *prog, Tape *tape, int additionalVal) {
 }
 
 void executeWithTape(Program *prog, Tape *tape) {
-    printf("\n");
-    printProg(prog);
-    printf("\n");
+    if (isVerbose()) {
+        printf("\n");
+        printProg(prog);
+        printf("\n");
+    }
     
     for (int i=0; i<MAX_EXECUTION; i++) {
         int returnCode = step(prog, tape, 0);
@@ -103,7 +108,7 @@ Instruction charToInstruction(const char c) {
 int defaultForInstruction(Instruction inst) {
     switch (inst) {
         case NOP: return 0;
-        case RED: return 1;
+        case RED: return 0;
         case DUP: return 1;
         case INS: return 1;
         case OUT: return 0;
@@ -116,7 +121,7 @@ int defaultForInstruction(Instruction inst) {
         case ADD: return 1;
         case DEC: return 1;
         case SUB: return 1;
-        case DAT: return 1;
+        case DAT: return 0;
         case DIV: return 1;
         default:  return 0;
     }
@@ -182,7 +187,7 @@ Instance* newInstance(void) {
 }
 
 void printTape(Tape tape) {
-    printf("[... ");
+    printf("\n[... ");
     for (int i=tape.pos-10; i<=tape.pos+10; i++) {
         int index = ((i > 0 ? i : TAPE_SIZE+i) % TAPE_SIZE);
         if (i==tape.pos) {
@@ -199,7 +204,7 @@ void printTape(Tape tape) {
             }
         }
     }
-    printf("...]\n");
+    printf("...]");
 }
 
 void printProg(Program *prog) {
@@ -215,6 +220,7 @@ void printProg(Program *prog) {
 //            break;
     }
     
+    printf("\n");
     for (int i=0; i<PROG_SIZE; i++) {
         printf("%c%d ", str[i], val[i]);
     
@@ -248,8 +254,9 @@ Program* progFromBytes(const char *str) {
     for (i=0; i<length; i++) {
         CodePoint cp = codePointFromEncodedChar(str[i]);
         prog->code[i] = cp;
-        printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
-        
+        if (isVerbose()) {
+            printf("(%d): inst: %c val: %d\n", i, instructionToChar(cp.inst), cp.val);
+        }
     }
     i++;
     prog->code[i] = (CodePoint){ .inst=0, .val=0 };
@@ -263,6 +270,7 @@ Program* progFromString(const char *str) {
     unsigned long length = strlen(str);
     
     int skipData = 0;
+    bool skipToNop = false;
 
     int j=0;
     bool comment = false;
@@ -273,13 +281,30 @@ Program* progFromString(const char *str) {
             comment = false;
         } else {
             if (!comment) {
-                if (skipData > 0) {
+                if (skipData > 0 || skipToNop) {
                     CodePoint cp = codePointFromEncodedChar(str[i]);
-                    prog->code[j] = cp;
+                    if (cp.inst == DUP && cp.val == 0) {
+                        skipToNop = false;
+                        prog->code[j] = (CodePoint){ .inst=NOP, .val=0 };
+                        if (isVerbose()) {
+                            printf("(%d, %d): inst: 0 val: 0\n", i, j);
+                        }
+                    } else {
+                        prog->code[j] = cp;
+                        if (isVerbose()) {
+                            printf("(%d, %d): dat: %c%d => %d\n", i, j, instructionToChar(cp.inst), cp.val, (cp.inst << 4) | cp.val);
+                        }
+                    }
                     j++;
                     skipData--;
                     
-                    printf("(%d, %d): dat: %c/%d => %d\n", i, j, instructionToChar(cp.inst), cp.val, (cp.inst << 4) | cp.val);
+                    // this looks weird... it turns out that our no-op instruction
+                    // when processed from the raw bytes (which is a space)
+                    // comes out as a DUP3 instruction
+                    // THIS IS A NOP:
+
+                    
+                   
                     continue;
                 }
                 errno = 0;
@@ -304,9 +329,15 @@ Program* progFromString(const char *str) {
                 }
 
                 if (inst == DAT) {
-                    skipData = val;
+                    if (val == 0) {
+                        skipToNop = true;
+                    } else {
+                        skipData = val;
+                    }
                 }
-                printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+                if (isVerbose()) {
+                    printf("(%d, %d): inst: %c val: %d\n", i, j, instructionToChar(inst), val);
+                }
                 prog->code[j] = (CodePoint) {.inst=inst, .val=val };
                 j++;
             }
@@ -315,4 +346,13 @@ Program* progFromString(const char *str) {
     prog->code[j] = (CodePoint){ .inst=0, .val=0 };
     
     return prog;
+}
+
+bool progIsEmpty(Program prog) {
+    for (int i=0; i<PROG_SIZE; i++) {
+        if (prog.code[i].inst != 0 || prog.code[i].val != 0) {
+            return false;
+        }
+    }
+    return true;
 }

@@ -19,14 +19,20 @@
 /* Flag set by ‘--verbose’. */
 static int verbose_flag;
 
+/* Flag set by '--quiet' */
+static int quiet_flag;
+
 /* Flag set by ‘--byte-encoded’. */
 static int byte_encoded;
 
 int main(int argc, const char *argv[]) {
     int c;
     int numBytes;
-    unsigned int seed;
+    unsigned int seed = 0;
     bool repl = false;
+    
+    int executeCount = 1;
+    
     Program *prog = NULL;
     
     while (1)
@@ -36,10 +42,13 @@ int main(int argc, const char *argv[]) {
             /* These options set a flag. */
             {"verbose",     no_argument,       &verbose_flag, 1},
             {"byte-encoded",no_argument,       &byte_encoded, 'b'},
+            {"quiet",       no_argument,       &quiet_flag, 'q'},
             /* These options don’t set a flag.
              We distinguish them by their indices. */
             {"version",     no_argument,       0, 'v'},
             {"interactive", no_argument,       0, 'i'},
+            {"seed",        required_argument, 0, 's'},
+            {"recurse",     required_argument, 0, 'R'},
             {"random",      required_argument, 0, 'r'},
             {"execute",     required_argument, 0, 'e'},
 //            {"file",        required_argument, 0, 'f'},
@@ -48,7 +57,7 @@ int main(int argc, const char *argv[]) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
         
-        c = getopt_long (argc, argv, "vbire:",
+        c = getopt_long (argc, argv, "vbiqs:r:R:e:",
                          long_options, &option_index);
         
         /* Detect the end of the options. */
@@ -71,18 +80,29 @@ int main(int argc, const char *argv[]) {
                 repl = true;
                 break;
                 
+            case 'R':
+                executeCount = (unsigned int)strtol(optarg, NULL, 10);
+                break;
+                
+            case 's':
+                seed = (unsigned int)strtol(optarg, NULL, 10);
+                break;
+                
             case 'r':
-                seed = (unsigned int)time(NULL);
+                if (seed == 0) {
+                    seed = (unsigned int)time(NULL) * getpid();
+                }
                 srand(seed);
-                if (verbose_flag) {
+                if (isVerbose()) {
                     printf("seed: %d", seed);
                 }
-                numBytes = (unsigned int)strtol(optarg, NULL, 16);
+                numBytes = (unsigned int)strtol(optarg, NULL, 10);
                 prog = progFromBytes(generateBytes(numBytes));
                 break;
                 
             case 'e':
-                printf("Given prog: %s", optarg);
+                if (isVerbose()) printf("Given prog: %s", optarg);
+                
                 if (byte_encoded) {
                     prog = progFromBytes(optarg);
                 } else {
@@ -116,33 +136,66 @@ int main(int argc, const char *argv[]) {
         putchar ('\n');
     }
     
-    if (prog != NULL) {
-        Tape *tape = tapeFromExecution(prog, NULL);
-        
-        if (repl) {
+    for (int i=0; i<executeCount; i++) {
+        Tape *tape = newTape();
+        if (prog != NULL) {
+             tape = tapeFromExecution(prog, NULL);
+            
+            if (repl) {
+                runRepl(prog, tape);
+            }
+        } else if (repl) {
             runRepl(prog, tape);
         }
-    } else if (repl) {
-        runRepl(prog, NULL);
+        if (!isQuiet()) printProg(prog);
+        
+        free(prog);
+        
+        if (executeCount > 1) {
+            char newText[PROG_SIZE];
+            for (int i=0; i<PROG_SIZE; i++) {
+                newText[i] = tape->values[i] % 256;
+            }
+            prog = progFromBytes(newText);
+            if (progIsEmpty(*prog)) {
+                if (!isQuiet()) {
+                    printf("Resulting program from tape is empty. Skipping recursion. (made %d passes, starting with seed %d)", i+1, seed);
+                    break;
+                }
+            } else {
+                if (!isQuiet()) {
+                    printf("Reusing tape as new program: %d", i+1);
+                }
+            }
+        }
     }
-    free(prog);
+
     
+    printf("\n");
     exit (0);
 }
 
 const char *generateBytes(size_t num_bytes) {
-  unsigned char *stream = malloc (num_bytes);
-  size_t i;
+    unsigned char *stream = malloc (num_bytes);
+    size_t i;
+    
+    for (i = 0; i < num_bytes; i++) {
+        stream[i] = rand ();
+    }
+ 
+    return stream;
+}
 
-  for (i = 0; i < num_bytes; i++) {
-    stream[i] = rand ();
-  }
+bool isVerbose(void) {
+    return verbose_flag;
+}
 
-  return stream;
+bool isQuiet(void) {
+    return quiet_flag;
 }
 
 void runRepl(Program *prog, Tape *tape) {
-    printf("helc version 0.0.1\n");
+    printf("\nhelc version 0.0.1\n");
     printf("-- Interactive mode --\n");
     
     char input[MAX_INPUT_SIZE];
@@ -172,7 +225,6 @@ void runRepl(Program *prog, Tape *tape) {
             break;
         }
         
-        
         Program *inputProg = progFromString(input);
         
         // if there was only one instruction with no
@@ -191,10 +243,9 @@ void runRepl(Program *prog, Tape *tape) {
         while (returnCode) {
             returnCode = step(prog, tape, 0);
         }
-        printProg(prog);
+        if (!isQuiet()) printProg(prog);
         
 //        printTape(*tape);
         printf("\n");
     }
-    
 }
