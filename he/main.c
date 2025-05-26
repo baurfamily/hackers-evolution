@@ -28,7 +28,7 @@ static int byte_encoded;
 int main(int argc, const char *argv[]) {
     int c;
     int numBytes;
-    unsigned int seed;
+    unsigned int seed = 0;
     bool repl = false;
     
     int executeCount = 1;
@@ -47,6 +47,7 @@ int main(int argc, const char *argv[]) {
              We distinguish them by their indices. */
             {"version",     no_argument,       0, 'v'},
             {"interactive", no_argument,       0, 'i'},
+            {"seed",        required_argument, 0, 's'},
             {"recurse",     required_argument, 0, 'R'},
             {"random",      required_argument, 0, 'r'},
             {"execute",     required_argument, 0, 'e'},
@@ -56,7 +57,7 @@ int main(int argc, const char *argv[]) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
         
-        c = getopt_long (argc, argv, "vbiqr:R:e:",
+        c = getopt_long (argc, argv, "vbiqs:r:R:e:",
                          long_options, &option_index);
         
         /* Detect the end of the options. */
@@ -83,10 +84,16 @@ int main(int argc, const char *argv[]) {
                 executeCount = (unsigned int)strtol(optarg, NULL, 10);
                 break;
                 
+            case 's':
+                seed = (unsigned int)strtol(optarg, NULL, 10);
+                break;
+                
             case 'r':
-                seed = (unsigned int)time(NULL);
+                if (seed == 0) {
+                    seed = (unsigned int)time(NULL);
+                }
                 srand(seed);
-                if (verbose_flag) {
+                if (!isQuiet()) {
                     printf("seed: %d", seed);
                 }
                 numBytes = (unsigned int)strtol(optarg, NULL, 10);
@@ -148,8 +155,12 @@ int main(int argc, const char *argv[]) {
             prog = progFromBytes((char*)tape->values);
             if (progIsEmpty(*prog)) {
                 if (!isQuiet()) {
-                    printf("Resulting program from tape is empty. Skipping recursion.");
+                    printf("Resulting program from tape is empty. Skipping recursion. (made %d passes)", i+1);
                     break;
+                }
+            } else {
+                if (!isQuiet()) {
+                    printf("Reusing tape as new program: %d", i+1);
                 }
             }
         }
