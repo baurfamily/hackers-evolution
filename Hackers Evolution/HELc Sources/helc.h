@@ -57,8 +57,7 @@ typedef struct Program {
 } Program;
 
 typedef struct Tape {
-//    int pos;
-    char values[TAPE_SIZE];
+    unsigned char values[TAPE_SIZE];
 } Tape;
 
 typedef struct Instance {
