@@ -85,5 +85,6 @@ CodePoint codePointFromString(const char *str);
 Program* progFromBytes(const char *str);
 Program* progFromString(const char *str);
 bool progIsEmpty(Program prog);
+void extendProg(Program *prog, char *input);
 
 #endif

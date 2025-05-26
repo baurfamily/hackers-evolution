@@ -341,3 +341,19 @@ bool progIsEmpty(Program prog) {
     }
     return true;
 }
+
+void extendProg(Program *prog, char *input) {
+    Program *inputProg = progFromString(input);
+    
+    // if there was only one instruction with no
+    // value specified, use 1 - it's a common enough default
+    if (strlen(input) == 1) { inputProg->code[0].val = 1; }
+    
+    for (int i=0; i<PROG_SIZE; i++) {
+        CodePoint cp = inputProg->code[i];
+        if (cp.inst != NOP) {
+            prog->code[prog->pos+i] = cp;
+//                printf("wrote instruction: %d => ( %c, %d )", prog->pos, instructionToChar(cp.inst), cp.val);
+        }
+    }
+}
