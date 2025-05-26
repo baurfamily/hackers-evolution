@@ -66,8 +66,8 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "--seed=1748221813"
-            isEnabled = "NO">
+            argument = "--seed=-1311815674"
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "--recurse=10"

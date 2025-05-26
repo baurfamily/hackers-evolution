@@ -90,10 +90,10 @@ int main(int argc, const char *argv[]) {
                 
             case 'r':
                 if (seed == 0) {
-                    seed = (unsigned int)time(NULL);
+                    seed = (unsigned int)time(NULL) * getpid();
                 }
                 srand(seed);
-                if (!isQuiet()) {
+                if (isVerbose()) {
                     printf("seed: %d", seed);
                 }
                 numBytes = (unsigned int)strtol(optarg, NULL, 10);
@@ -152,10 +152,14 @@ int main(int argc, const char *argv[]) {
         free(prog);
         
         if (executeCount > 1) {
-            prog = progFromBytes((char*)tape->values);
+            char newText[PROG_SIZE];
+            for (int i=0; i<PROG_SIZE; i++) {
+                newText[i] = tape->values[i] % 256;
+            }
+            prog = progFromBytes(newText);
             if (progIsEmpty(*prog)) {
                 if (!isQuiet()) {
-                    printf("Resulting program from tape is empty. Skipping recursion. (made %d passes)", i+1);
+                    printf("Resulting program from tape is empty. Skipping recursion. (made %d passes, starting with seed %d)", i+1, seed);
                     break;
                 }
             } else {
